@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../shared/widgets/halogen_back_button.dart';
 import '../../../../shared/widgets/secured_mobility_progress_bar.dart';
 import '../../../../shared/widgets/trip_option_tile.dart';
@@ -29,11 +30,6 @@ class _SecuredMobilityDesiredServicesScreenState extends State<SecuredMobilityDe
       builder: (context, provider, _) {
         final selectedTrip = provider.selectedTripType;
 
-        // ✅ Advance to stage 2 if complete
-        if (provider.isTripSectionComplete && provider.currentStage < 2) {
-          provider.markStageComplete(2);
-        }
-
         return Scaffold(
           body: SafeArea(
             child: SingleChildScrollView(
@@ -42,19 +38,30 @@ class _SecuredMobilityDesiredServicesScreenState extends State<SecuredMobilityDe
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
-                      HalogenBackButton(),
-                      SizedBox(width: 12),
-                      Text(
-                        'Desired Services',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Objective',
+                    children: [
+                      const HalogenBackButton(),
+                      Expanded(
+                        child: Animate(
+                          effects: [
+                            FadeEffect(duration: 400.ms),
+                            SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero),
+                          ],
+                          child: const Text(
+                            'Desired Services',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Objective',
+                              color: Color(0xFF1C2B66), 
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 48),
                     ],
                   ),
+
                   const SizedBox(height: 20),
                   SecuredMobilityProgressBar(
                     percent: provider.progressPercent,

@@ -30,31 +30,34 @@ class _PhysicalSecurityScreenState extends State<PhysicalSecurityScreen> {
   @override
   void initState() {
     super.initState();
-      final provider = Provider.of<PhysicalSecurityProvider>(context, listen: false);
+    final provider = Provider.of<PhysicalSecurityProvider>(context, listen: false);
 
-      Future.microtask(() async {
-        final userProfile = await SessionManager.getUserProfile();
+    houseNumberController.text = provider.houseNumber;
+    streetNameController.text = provider.streetName;
+    areaController.text = provider.area;
+    stateController.text = provider.state;
 
-        // Fill from SessionManager only if provider doesn't already have it
-        if (userProfile != null) {
-          if (provider.houseNumber.isEmpty && userProfile['houseNumber'] != null) {
-            provider.updateInspectionData(houseNum: userProfile['houseNumber']);
-            houseNumberController.text = userProfile['houseNumber'];
-          }
-          if (provider.streetName.isEmpty && userProfile['streetName'] != null) {
-            provider.updateInspectionData(street: userProfile['streetName']);
-            streetNameController.text = userProfile['streetName'];
-          }
-          if (provider.area.isEmpty && userProfile['area'] != null) {
-            provider.updateInspectionData(areaText: userProfile['area']);
-            areaController.text = userProfile['area'];
-          }
-          if (provider.state.isEmpty && userProfile['state'] != null) {
-            provider.updateInspectionData(stateText: userProfile['state']);
-            stateController.text = userProfile['state'];
-          }
+    Future.microtask(() async {
+      final userProfile = await SessionManager.getUserProfile();
+      if (userProfile != null) {
+        if (provider.houseNumber.isEmpty && userProfile['houseNumber'] != null) {
+          provider.updateInspectionData(houseNum: userProfile['houseNumber']);
+          houseNumberController.text = userProfile['houseNumber'];
         }
-      });
+        if (provider.streetName.isEmpty && userProfile['streetName'] != null) {
+          provider.updateInspectionData(street: userProfile['streetName']);
+          streetNameController.text = userProfile['streetName'];
+        }
+        if (provider.area.isEmpty && userProfile['area'] != null) {
+          provider.updateInspectionData(areaText: userProfile['area']);
+          areaController.text = userProfile['area'];
+        }
+        if (provider.state.isEmpty && userProfile['state'] != null) {
+          provider.updateInspectionData(stateText: userProfile['state']);
+          stateController.text = userProfile['state'];
+        }
+      }
+    });
   }
 
   @override
@@ -84,7 +87,6 @@ class _PhysicalSecurityScreenState extends State<PhysicalSecurityScreen> {
               ),
             ),
           ),
-          // 🧱 ACTUAL CONTENT OVERLAY
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -95,15 +97,19 @@ class _PhysicalSecurityScreenState extends State<PhysicalSecurityScreen> {
                   children: [
                     const HalogenBackButton(),
                     Expanded(
-                      child: Text(
-                        "Physical Security",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Objective',
+                      child: Animate(
+                        effects: [FadeEffect(duration: 400.ms), SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero)],
+                        child: const Text(
+                          "Physical Security",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Objective',
+                            color: Color(0xFF1C2B66),
+                          ),
                         ),
-                      ).animate().fade(duration: 400.ms).slideY(begin: 0.3, end: 0),
+                      ),
                     ),
                     const SizedBox(width: 48),
                   ],

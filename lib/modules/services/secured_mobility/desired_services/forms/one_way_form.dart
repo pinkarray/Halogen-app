@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/secured_mobility_provider.dart';
+import '../../../../../shared/widgets/underlined_glow_input_field.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class OneWayForm extends StatefulWidget {
   const OneWayForm({super.key});
@@ -13,7 +15,6 @@ class OneWayForm extends StatefulWidget {
 class _OneWayFormState extends State<OneWayForm> {
   final TextEditingController pickupController = TextEditingController();
   final TextEditingController dropoffController = TextEditingController();
-  final TextEditingController returnDropoffController = TextEditingController();
   Timer? _debounce;
 
   @override
@@ -50,47 +51,35 @@ class _OneWayFormState extends State<OneWayForm> {
       dropoff: dropoffController.text,
     );
   }
-  
+
   @override
   void dispose() {
     _debounce?.cancel();
-    _immediateSave(); 
+    _immediateSave();
     pickupController.dispose();
     dropoffController.dispose();
-    returnDropoffController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    const inputDecoration = InputDecoration(
-      labelStyle: TextStyle(color: Colors.black),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 1.5),
-      ),
-      border: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
+        UnderlinedGlowInputField(
+          label: 'Pick Up Address',
           controller: pickupController,
-          decoration: inputDecoration.copyWith(labelText: 'Pick up address'),
+          icon: Icons.location_on,
           onChanged: (_) => _onFieldChanged(),
         ),
         const SizedBox(height: 16),
-        TextField(
+        UnderlinedGlowInputField(
+          label: 'Drop Off Address',
           controller: dropoffController,
-          decoration: inputDecoration.copyWith(labelText: 'Drop off address'),
+          icon: Icons.flag,
           onChanged: (_) => _onFieldChanged(),
         ),
       ],
-    );
+    ).animate().fade(duration: 400.ms).slideY(begin: 0.3, end: 0);
   }
 }

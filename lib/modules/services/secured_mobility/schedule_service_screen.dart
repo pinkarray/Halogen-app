@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'providers/secured_mobility_provider.dart';
 import '../../../shared/widgets/halogen_back_button.dart';
+import '../../../shared/widgets/secured_mobility_progress_bar.dart';
+import '../../../shared/widgets/underlined_glow_input_field.dart';
+import '../../../shared/widgets/underlined_glow_custom_date_picker.dart';
+import '../../../shared/widgets/underlined_glow_custom_time_picker.dart';
 
 class ScheduleServiceScreen extends StatefulWidget {
   const ScheduleServiceScreen({super.key});
@@ -25,7 +30,6 @@ class _ScheduleServiceScreenState extends State<ScheduleServiceScreen> {
     _selectedDate = provider.pickupDate;
     _selectedTime = provider.pickupTime;
 
-    // Auto-save when user types
     _pickupController.addListener(_save);
     _dropoffController.addListener(_save);
   }
@@ -39,12 +43,13 @@ class _ScheduleServiceScreenState extends State<ScheduleServiceScreen> {
       time: _selectedTime,
     );
 
-    if (provider.pickupLocation?.isNotEmpty == true &&
+    final allSet = provider.pickupLocation?.isNotEmpty == true &&
         provider.dropoffLocation?.isNotEmpty == true &&
         provider.pickupDate != null &&
-        provider.pickupTime != null &&
-        provider.currentStage < 4) {
-      provider.markStageComplete(4);
+        provider.pickupTime != null;
+
+    if (allSet && provider.currentStage < 3) {
+      provider.markStageComplete(3);
       provider.calculateTotalCost();
     }
   }
@@ -60,152 +65,114 @@ class _ScheduleServiceScreenState extends State<ScheduleServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<SecuredMobilityProvider>();
+
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            height: constraints.maxHeight,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.white, Color(0xFFFFFAEA)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: const [
-                            HalogenBackButton(),
-                            SizedBox(width: 12),
-                            Text(
-                              'Schedule Service',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Objective',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'Pick Up & Drop Off (One way)',
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Color(0xFFFFFAEA)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🔹 Animated Header
+                Row(
+                  children: [
+                    const HalogenBackButton(),
+                    Expanded(
+                      child: Animate(
+                        effects: [
+                          FadeEffect(duration: 400.ms),
+                          SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero),
+                        ],
+                        child: const Text(
+                          'Schedule Service',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                             fontFamily: 'Objective',
+                            color: Color(0xFF1C2B66),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Pick up location', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 6),
-                              TextField(
-                                controller: _pickupController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter location',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text('Drop off location', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 6),
-                              TextField(
-                                controller: _dropoffController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter location',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text('Pick up date', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onTap: () async {
-                                  final date = await showDatePicker(
-                                    context: context,
-                                    initialDate: _selectedDate ?? DateTime.now(),
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime(2100),
-                                  );
-                                  if (date != null) {
-                                    setState(() {
-                                      _selectedDate = date;
-                                    });
-                                    _save();
-                                  }
-                                },
-                                child: InputDecorator(
-                                  decoration: const InputDecoration(
-                                    hintText: 'Pick your preferred date',
-                                    border: OutlineInputBorder(),
-                                    suffixIcon: Icon(Icons.calendar_today, color: Colors.black),
-                                  ),
-                                  child: Text(
-                                    _selectedDate != null
-                                        ? '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}'
-                                        : '',
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text('Pick up time', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onTap: () async {
-                                  final time = await showTimePicker(
-                                    context: context,
-                                    initialTime: _selectedTime ?? TimeOfDay.now(),
-                                  );
-                                  if (time != null) {
-                                    setState(() {
-                                      _selectedTime = time;
-                                    });
-                                    _save();
-                                  }
-                                },
-                                child: InputDecorator(
-                                  decoration: const InputDecoration(
-                                    hintText: 'Pick your preferred time',
-                                    border: OutlineInputBorder(),
-                                    suffixIcon: Icon(Icons.access_time, color: Colors.black),
-                                  ),
-                                  child: Text(
-                                    _selectedTime != null
-                                        ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
-                                        : '',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                      ],
+                      ),
                     ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // 🔹 Progress Bar
+                SecuredMobilityProgressBar(
+                  percent: provider.progressPercent,
+                  currentStep: 3,
+                ),
+
+                const SizedBox(height: 24),
+
+                const Text(
+                  'Pick Up & Drop Off (One way)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontFamily: 'Objective',
+                    color: Color(0xFF1C2B66),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 16),
+
+                // 🔹 Input Fields
+                UnderlinedGlowInputField(
+                  label: 'Pick up location',
+                  controller: _pickupController,
+                  icon: Icons.my_location_outlined,
+                  onChanged: (_) => _save(),
+                ),
+                const SizedBox(height: 16),
+
+                UnderlinedGlowInputField(
+                  label: 'Drop off location',
+                  controller: _dropoffController,
+                  icon: Icons.location_on_outlined,
+                  onChanged: (_) => _save(),
+                ),
+                const SizedBox(height: 16),
+
+                UnderlinedGlowCustomDatePickerField(
+                  label: 'Pick up date',
+                  selectedDate: _selectedDate,
+                  onConfirm: (date) {
+                    setState(() => _selectedDate = date);
+                    _save();
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                UnderlinedGlowCustomTimePickerField(
+                  label: 'Pick up time',
+                  selectedTime: _selectedTime,
+                  onConfirm: (time) {
+                    setState(() => _selectedTime = time);
+                    _save();
+                  },
+                ),
+
+                const SizedBox(height: 32),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

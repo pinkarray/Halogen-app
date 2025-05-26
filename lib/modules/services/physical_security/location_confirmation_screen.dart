@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/widgets/glowing_arrows_button.dart';
+import '../../../shared/widgets/underlined_glow_input_field.dart';
 import './providers/physical_security_provider.dart';
 import 'dart:async';
 
@@ -111,20 +112,16 @@ class _LocationConfirmationScreenState extends State<LocationConfirmationScreen>
                   ),
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-                  ),
-                  child: TextFormField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Input your address',
-                    ),
-                  ),
+                UnderlinedGlowInputField(
+                  label: 'Input your address',
+                  controller: _addressController,
+                  icon: Icons.location_on,
+                  onChanged: (val) {
+                    setState(() {
+                      isAddressValid = val.trim().isNotEmpty;
+                    });
+                  },
+                  textCapitalization: TextCapitalization.words,
                 ),
                 const SizedBox(height: 16),
                 GlowingArrowsButton(

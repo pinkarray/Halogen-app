@@ -11,10 +11,17 @@ class HalogenBackButton extends StatelessWidget {
       icon: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.black.withValues(alpha: 77), width: 1),
+          border: Border.all(
+            color: const Color(0xFF1C2B66).withOpacity(0.3), // ✅ Brand blue with soft opacity
+            width: 1,
+          ),
         ),
         padding: const EdgeInsets.all(6),
-        child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Colors.black),
+        child: const Icon(
+          Icons.arrow_back_ios_new,
+          size: 16,
+          color: Color(0xFF1C2B66), // ✅ Solid brand blue
+        ),
       ),
       onPressed: onPressed ?? () => Navigator.of(context).maybePop(),
       tooltip: 'Back',

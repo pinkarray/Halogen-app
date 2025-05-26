@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/widgets/halogen_back_button.dart';
 import '../../../shared/widgets/service_option_group.dart';
+import '../../../shared/widgets/secured_mobility_progress_bar.dart';
 import './providers/secured_mobility_provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
   const SecuredMobilityServiceConfigurationScreen({super.key});
@@ -11,10 +13,9 @@ class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<SecuredMobilityProvider>(context);
 
-    // ✅ Auto-complete the stage when all required selections are done
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (provider.isServiceConfigurationComplete && provider.currentStage < 3) {
-        provider.markStageComplete(3);
+      if (provider.isServiceConfigurationComplete && provider.currentStage < 2) {
+        provider.markStageComplete(2);
       }
     });
 
@@ -35,23 +36,42 @@ class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 🔹 Animated Centered Header
                 Row(
-                  children: const [
-                    HalogenBackButton(),
-                    SizedBox(width: 12),
-                    Text(
-                      'Service Configuration',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Objective',
+                  children: [
+                    const HalogenBackButton(),
+                    Expanded(
+                      child: Animate(
+                        effects: [
+                          FadeEffect(duration: 400.ms),
+                          SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero),
+                        ],
+                        child: const Text(
+                          'Service Configuration',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Objective',
+                            color: Color(0xFF1C2B66),
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 48),
                   ],
                 ),
-                const SizedBox(height: 24),
-                const Divider(color: Colors.transparent),
 
+                const SizedBox(height: 20),
+
+                SecuredMobilityProgressBar(
+                  percent: provider.progressPercent,
+                  currentStep: 2,
+                ),
+
+                const SizedBox(height: 24),
+
+                
                 const ServiceOptionGroup(
                   title: 'Vehicle Choice',
                   sectionKey: 'vehicle_choice',
@@ -71,7 +91,7 @@ class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
                   sectionKey: 'in_car_protection',
                   options: [
                     'Unarmed - Closed Protection Officer',
-                    'Armed - LEA (Law Enforcement Agent)'
+                    'Armed - LEA (Law Enforcement Agent)',
                   ],
                 ),
               ],

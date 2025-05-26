@@ -19,6 +19,8 @@ class ServiceOptionGroup extends StatefulWidget {
 }
 
 class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
+  static const Color brandBlue = Color(0xFF1C2B66);
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SecuredMobilityProvider>(context);
@@ -56,7 +58,7 @@ class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
                 child: Icon(
                   isEnabled ? Icons.check_box : Icons.check_box_outline_blank,
                   key: ValueKey(isEnabled),
-                  color: isEnabled ? Colors.black : Colors.grey,
+                  color: isEnabled ? brandBlue : Colors.grey,
                 ),
               ),
               const SizedBox(width: 12),
@@ -66,6 +68,7 @@ class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Objective',
+                  color: brandBlue,
                 ),
               ),
             ],
@@ -84,10 +87,7 @@ class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? Colors.black : Colors.grey.shade300,
-                      width: 1.5,
-                    ),
+                    // ❌ No border here at all
                   ),
                   child: Row(
                     children: [
@@ -98,7 +98,7 @@ class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
                         child: Icon(
                           isSelected ? Icons.check_circle : Icons.radio_button_off,
                           key: ValueKey(isSelected),
-                          color: isSelected ? Colors.black : Colors.grey,
+                          color: isSelected ? brandBlue : Colors.grey,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -108,7 +108,7 @@ class _ServiceOptionGroupState extends State<ServiceOptionGroup> {
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'Objective',
-                            color: isSelected ? Colors.black : Colors.grey.shade700,
+                            color: isSelected ? brandBlue : Colors.grey.shade700,
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           ),
                         ),

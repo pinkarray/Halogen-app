@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../shared/widgets/glowing_arrows_button.dart';
 import '../../providers/secured_mobility_provider.dart';
+import '../../../../../shared/widgets/underlined_glow_input_field.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ReturnForm extends StatefulWidget {
   const ReturnForm({super.key});
@@ -40,7 +42,6 @@ class _ReturnFormState extends State<ReturnForm> {
     });
   }
   
-
   void _debouncedSave() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
@@ -64,6 +65,7 @@ class _ReturnFormState extends State<ReturnForm> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -119,33 +121,23 @@ class _ReturnFormState extends State<ReturnForm> {
 
   @override
   Widget build(BuildContext context) {
-    const inputDecoration = InputDecoration(
-      labelStyle: TextStyle(color: Colors.black),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 1.5),
-      ),
-      border: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
+        UnderlinedGlowInputField(
           controller: pickupController,
-          decoration: inputDecoration.copyWith(labelText: 'Pick up address'),
+          label: 'Pick up address',
+          icon: Icons.my_location_outlined,
           onChanged: (_) => _debouncedSave(),
-        ),
+        ).animate().fade(duration: 300.ms).slideY(begin: 0.05),
         const SizedBox(height: 16),
-        TextField(
+        UnderlinedGlowInputField(
           controller: dropoffController,
-          decoration: inputDecoration.copyWith(labelText: 'Drop off address'),
+          label: 'Drop off address',
+          icon: Icons.location_on_outlined,
           onChanged: (_) => _debouncedSave(),
-        ),
+        ).animate().fade(duration: 300.ms).slideY(begin: 0.1),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -153,7 +145,7 @@ class _ReturnFormState extends State<ReturnForm> {
               data: Theme.of(context).copyWith(unselectedWidgetColor: Colors.black),
               child: Checkbox(
                 value: returnSameAsPickup,
-                activeColor: Colors.black,
+                activeColor: const Color(0xFF1C2B66),
                 onChanged: (val) {
                   setState(() {
                     returnSameAsPickup = val ?? false;
@@ -161,10 +153,15 @@ class _ReturnFormState extends State<ReturnForm> {
                       returnDropoffController.text = pickupController.text;
                     } else {
                       returnDropoffController.clear();
+
+                      // Show modal when user unchecks and pickup is not empty
+                      if (!_tappedReturn && pickupController.text.trim().isNotEmpty) {
+                        _handleReturnTap();
+                      }
                     }
                   });
                   _debouncedSave();
-                },
+                }
               ),
             ),
             const Expanded(
@@ -176,13 +173,20 @@ class _ReturnFormState extends State<ReturnForm> {
           ],
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: returnDropoffController,
-          enabled: !returnSameAsPickup,
-          decoration: inputDecoration.copyWith(labelText: 'Return drop off address'),
-          onTap: _handleReturnTap,
-          onChanged: (_) => _debouncedSave(),
-        ),
+        GestureDetector(
+          onTap: () {
+            if (!returnSameAsPickup) _handleReturnTap();
+          },
+          child: IgnorePointer(
+            ignoring: returnSameAsPickup,
+            child: UnderlinedGlowInputField(
+              controller: returnDropoffController,
+              label: 'Return drop off address',
+              icon: Icons.undo_outlined,
+              onChanged: (_) => _debouncedSave(),
+            ),
+          ),
+        ).animate().fade(duration: 300.ms).slideY(begin: 0.2),
       ],
     );
   }

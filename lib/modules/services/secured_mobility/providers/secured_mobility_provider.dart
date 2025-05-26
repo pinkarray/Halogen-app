@@ -7,30 +7,25 @@ class SecuredMobilityProvider extends ChangeNotifier {
   double get progressPercent {
     double percent = 0.0;
 
-    // Stage 1
-    final tripComplete = isTripSectionComplete;
-    if (tripComplete) percent += 0.2;
+    // Stage 1: Desired Services
+    if (isTripSectionComplete) percent += 0.2;
 
-    // Stage 2
-    percent += serviceConfigurationProgress;
+    // Stage 2: Service Configuration
+    percent += serviceConfigurationProgress; // weighted max 0.2
 
-    // Stage 3
+    // Stage 3: Schedule Service
     final scheduleComplete = pickupLocation != null &&
         dropoffLocation != null &&
         pickupDate != null &&
         pickupTime != null;
     if (scheduleComplete) percent += 0.2;
 
-    if (isTripSectionComplete) percent += 0.2;
-    percent += serviceConfigurationProgress; // weighted sub-steps
-    if (pickupLocation != null && dropoffLocation != null && pickupDate != null && pickupTime != null) {
-      percent += 0.2;
-    }
+    // Stage 4: Confirm Order (optional logic could be added later)
 
-    // Stage 5
+    // Stage 5: Payment
     if (totalCost > 0) percent += 0.2;
 
-    return percent;
+    return percent.clamp(0.0, 1.0);
   }
 
   double get serviceConfigurationProgress {

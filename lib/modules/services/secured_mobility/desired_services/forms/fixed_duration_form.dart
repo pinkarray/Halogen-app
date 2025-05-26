@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../shared/widgets/underlined_glow_input_field.dart';
 import '../../providers/secured_mobility_provider.dart';
 
 class FixedDurationForm extends StatefulWidget {
@@ -16,13 +17,7 @@ class _FixedDurationFormState extends State<FixedDurationForm> {
   String? numberOfDays;
   String? interstate;
 
-  final List<String> dayOptions = [
-    '1 day',
-    '2 days',
-    '3 days',
-    '4 days',
-    '5 days',
-  ];
+  final List<String> dayOptions = ['1 day', '2 days', '3 days', '4 days', '5 days'];
   final List<String> interstateOptions = ['Yes', 'No'];
 
   Timer? _debounce;
@@ -30,17 +25,13 @@ class _FixedDurationFormState extends State<FixedDurationForm> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<SecuredMobilityProvider>(
-      context,
-      listen: false,
-    );
+    final provider = Provider.of<SecuredMobilityProvider>(context, listen: false);
 
     pickupController.text = provider.pickupAddress;
     dropoffController.text = provider.dropoffAddress;
-    numberOfDays =
-        provider.numberOfDays != null
-            ? '${provider.numberOfDays} day${provider.numberOfDays! > 1 ? 's' : ''}'
-            : null;
+    numberOfDays = provider.numberOfDays != null
+        ? '${provider.numberOfDays} day${provider.numberOfDays! > 1 ? 's' : ''}'
+        : null;
     interstate = provider.interstateTravel;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,10 +45,7 @@ class _FixedDurationFormState extends State<FixedDurationForm> {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      final provider = Provider.of<SecuredMobilityProvider>(
-        context,
-        listen: false,
-      );
+      final provider = Provider.of<SecuredMobilityProvider>(context, listen: false);
       provider.updateFixedDurationTrip(
         pickup: pickupController.text,
         dropoff: dropoffController.text,
@@ -68,10 +56,7 @@ class _FixedDurationFormState extends State<FixedDurationForm> {
   }
 
   void _immediateSave() {
-    final provider = Provider.of<SecuredMobilityProvider>(
-      context,
-      listen: false,
-    );
+    final provider = Provider.of<SecuredMobilityProvider>(context, listen: false);
     provider.updateFixedDurationTrip(
       pickup: pickupController.text,
       dropoff: dropoffController.text,
@@ -91,55 +76,42 @@ class _FixedDurationFormState extends State<FixedDurationForm> {
 
   @override
   Widget build(BuildContext context) {
-    const inputDecoration = InputDecoration(
-      labelStyle: TextStyle(color: Colors.black),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 1.5),
-      ),
-      border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
+        UnderlinedGlowInputField(
           controller: pickupController,
-          decoration: inputDecoration.copyWith(labelText: 'Pick up address'),
+          label: 'Pick up address',
+          icon: Icons.my_location_outlined,
           onChanged: (_) => _debouncedSave(),
         ),
         const SizedBox(height: 16),
-        TextField(
+        UnderlinedGlowInputField(
           controller: dropoffController,
-          decoration: inputDecoration.copyWith(labelText: 'Drop off address'),
+          label: 'Drop off address',
+          icon: Icons.location_on_outlined,
           onChanged: (_) => _debouncedSave(),
         ),
         const SizedBox(height: 16),
-        DropdownButtonFormField<String>(
-          decoration: inputDecoration.copyWith(labelText: 'Number of Days'),
-          value: numberOfDays,
-          items:
-              dayOptions
-                  .map((day) => DropdownMenuItem(value: day, child: Text(day)))
-                  .toList(),
+        UnderlinedGlowInputField(
+          label: 'Number of Days',
+          icon: Icons.calendar_today_outlined,
+          controller: TextEditingController(text: numberOfDays),
+          dropdownOptions: dayOptions,
           onChanged: (value) {
             setState(() => numberOfDays = value);
-            _debouncedSave(); // call immediately but debounced
+            _debouncedSave();
           },
         ),
         const SizedBox(height: 16),
-        DropdownButtonFormField<String>(
-          decoration: inputDecoration.copyWith(labelText: 'Interstate Travel?'),
-          value: interstate,
-          items:
-              interstateOptions
-                  .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-                  .toList(),
+        UnderlinedGlowInputField(
+          label: 'Interstate Travel?',
+          icon: Icons.map_outlined,
+          controller: TextEditingController(text: interstate),
+          dropdownOptions: interstateOptions,
           onChanged: (value) {
             setState(() => interstate = value);
-            _debouncedSave(); // call immediately but debounced
+            _debouncedSave();
           },
         ),
       ],
