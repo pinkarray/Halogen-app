@@ -7,6 +7,7 @@ import 'terms/terms_and_conditions_screen.dart';
 import 'privacy_policy/privacy_policy_screen.dart';
 import 'support/support_screen.dart';
 import 'sos/sos_settings.dart';
+import 'sos/emergency_contacts_screen.dart'; // Add this import
 
 
 final Map<String, WidgetBuilder> settingsRoutes = {
@@ -18,5 +19,5 @@ final Map<String, WidgetBuilder> settingsRoutes = {
   '/privacy': (_) => const PrivacyPolicyScreen(),
   '/support': (_) => const SupportScreen(),
   '/sos-settings': (context) => const SosSettingsScreen(),
-  
+  '/emergency-contacts': (context) => const EmergencyContactsScreen(), // Add this route
 };
