@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:halogen/shared/widgets/halogen_back_button.dart';
@@ -25,7 +25,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   Future<void> _checkPermissionAndLoadContacts() async {
     final status = await Permission.contacts.request();
-    
     if (status.isGranted) {
       setState(() {
         _hasPermission = true;
@@ -41,12 +40,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   Future<void> _loadContacts() async {
     try {
-      // Load saved emergency contacts (in a real app, you'd load these from storage)
-      // For now, we'll just use an empty list
-      
-      // Load device contacts
-      final contacts = await ContactsService.getContacts();
-      
+      final contacts = await FlutterContacts.getContacts();
       setState(() {
         _deviceContacts = contacts.toList();
         _isLoading = false;
@@ -67,8 +61,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
         _emergencyContacts.add(contact);
       }
     });
-    
-    // In a real app, you would save this to persistent storage
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${contact.displayName} added as emergency contact')),
     );
@@ -76,12 +68,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   void _removeEmergencyContact(Contact contact) {
     setState(() {
-      _emergencyContacts.removeWhere(
-        (c) => c.identifier == contact.identifier,
-      );
+      _emergencyContacts.removeWhere((c) => c.id == contact.id);
     });
-    
-    // In a real app, you would update persistent storage
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${contact.displayName} removed from emergency contacts')),
     );
@@ -109,8 +97,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF1C2B66)))
           : !_hasPermission
-              ? _buildPermissionDeniedView()
-              : _buildContactsView(),
+          ? _buildPermissionDeniedView()
+          : _buildContactsView(),
     );
   }
 
@@ -166,7 +154,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_emergencyContacts.isNotEmpty) ...[  
+        if (_emergencyContacts.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
             child: Text(
@@ -214,7 +202,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                   ),
                   subtitle: Text(
                     contact.phones?.isNotEmpty == true
-                        ? contact.phones!.first.value ?? 'No phone'
+                        ? contact.phones!.first.number ?? 'No phone'
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),
@@ -228,7 +216,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
           ),
           const SizedBox(height: 20),
         ],
-        
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           child: Text(
@@ -241,7 +228,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
             ),
           ).animate().fade(duration: 300.ms),
         ),
-        
         Expanded(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -258,51 +244,46 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
             ),
             child: _deviceContacts.isEmpty
                 ? Center(
-                    child: Text(
-                      'No contacts found',
-                      style: TextStyle(fontFamily: 'Objective', color: Colors.grey),
-                    ),
-                  )
+              child: Text(
+                'No contacts found',
+                style: TextStyle(fontFamily: 'Objective', color: Colors.grey),
+              ),
+            )
                 : ListView.builder(
-                    itemCount: _deviceContacts.length,
-                    itemBuilder: (context, index) {
-                      final contact = _deviceContacts[index];
-                      final isAlreadyAdded = _emergencyContacts.any(
-                        (c) => c.identifier == contact.identifier,
-                      );
-                      
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF1C2B66),
-                          child: Text(
-                            contact.displayName?.isNotEmpty == true
-                                ? contact.displayName![0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        title: Text(
-                          contact.displayName ?? 'Unknown',
-                          style: const TextStyle(fontFamily: 'Objective'),
-                        ),
-                        subtitle: Text(
-                          contact.phones?.isNotEmpty == true
-                              ? contact.phones!.first.value ?? 'No phone'
-                              : 'No phone number',
-                          style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(
-                            isAlreadyAdded ? Icons.check_circle : Icons.add_circle_outline,
-                            color: isAlreadyAdded ? Colors.green : const Color(0xFF1C2B66),
-                          ),
-                          onPressed: isAlreadyAdded
-                              ? null
-                              : () => _addEmergencyContact(contact),
-                        ),
-                      );
-                    },
+              itemCount: _deviceContacts.length,
+              itemBuilder: (context, index) {
+                final contact = _deviceContacts[index];
+                final isAlreadyAdded = _emergencyContacts.any((c) => c.id == contact.id);
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: const Color(0xFF1C2B66),
+                    child: Text(
+                      contact.displayName?.isNotEmpty == true
+                          ? contact.displayName![0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
+                  title: Text(
+                    contact.displayName ?? 'Unknown',
+                    style: const TextStyle(fontFamily: 'Objective'),
+                  ),
+                  subtitle: Text(
+                    contact.phones?.isNotEmpty == true
+                        ? contact.phones!.first.number ?? 'No phone'
+                        : 'No phone number',
+                    style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(
+                      isAlreadyAdded ? Icons.check_circle : Icons.add_circle_outline,
+                      color: isAlreadyAdded ? Colors.green : const Color(0xFF1C2B66),
+                    ),
+                    onPressed: isAlreadyAdded ? null : () => _addEmergencyContact(contact),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ],

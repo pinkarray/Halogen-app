@@ -1,0 +1,22 @@
+name: contacts_service
+description: A Flutter plugin to access and manage the device's contacts.
+version: 0.6.3
+
+environment:
+  sdk: ">=2.12.0 <4.0.0"
+  flutter: ">=2.0.0"
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: flutter.plugins.contactsservice.contactsservice
+        pluginClass: ContactsServicePlugin
+      ios:
+        pluginClass: ContactsServicePlugin
+
+dependencies:
+  flutter:
+    sdk: flutter
+  collection: ^1.15.0
+  quiver: ^3.0.0
