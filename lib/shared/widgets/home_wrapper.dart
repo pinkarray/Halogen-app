@@ -3,6 +3,9 @@ import 'package:halogen/modules/dashboard/dashboard_screen.dart';
 import 'package:halogen/modules/services/services_screen.dart';
 import 'package:halogen/modules/settings/settings_screen.dart';
 import 'package:halogen/screens/monitoring_services_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'dart:ui';
 
 class HomeWrapper extends StatefulWidget {
   final int initialIndex;
@@ -24,7 +27,9 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
   ];
 
   late final List<AnimationController> _controllers;
-  late final List<Animation<double>> _jumpAnimations;
+  late final List<Animation<double>> _scaleAnimations;
+  late final AnimationController _fabAnimationController;
+  late final Animation<double> _fabRotationAnimation;
 
   @override
   void initState() {
@@ -36,39 +41,33 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
       4,
       (index) => AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 300),
       ),
     );
 
-    _jumpAnimations = _controllers.map((controller) {
-      return TweenSequence<double>([
-        TweenSequenceItem(
-          tween: Tween(begin: 0.0, end: -10.0),
-          weight: 50,
-        ),
-        TweenSequenceItem(
-          tween: Tween(begin: -10.0, end: 0.0),
-          weight: 50,
-        ),
-      ]).animate(
+    _scaleAnimations = _controllers.map((controller) {
+      return Tween<double>(begin: 1.0, end: 1.2).animate(
         CurvedAnimation(
           parent: controller,
           curve: Curves.easeOutBack,
         ),
       );
     }).toList();
+
+    // Start with the initial animation
+    _controllers[_selectedIndex].forward();
   }
 
   void _onItemTapped(int index) {
-    final controller = _controllers[index];
+    if (_selectedIndex == index) return;
 
-    if (!controller.isAnimating) {
-      controller.forward(from: 0.0);
-    }
+    // Reset previous animation
+    _controllers[_selectedIndex].reverse();
+    
+    // Start new animation
+    _controllers[index].forward();
 
-    if (_selectedIndex != index) {
-      setState(() => _selectedIndex = index);
-    }
+    setState(() => _selectedIndex = index);
   }
 
   @override
@@ -82,43 +81,129 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true, // Important for transparent bottom nav bar
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        selectedItemColor: const Color(0xFFFFCC29),
-        unselectedItemColor: Color(0xFF1C2B66),
-        showUnselectedLabels: true,
-        items: List.generate(4, (index) {
-          final iconData = [
-            Icons.dashboard,
-            Icons.shield_outlined,
-            Icons.videocam_outlined,
-            Icons.settings_outlined,
-          ][index];
+      bottomNavigationBar: _buildCustomBottomNavigationBar(),
+    );
+  }
 
-          final label = ["Dashboard", "Services", "Monitoring", "Settings"][index];
+  Widget _buildCustomBottomNavigationBar() {
+    return Container(
+      height: 80,
+      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+      ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 15,
+                spreadRadius: 1,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildIcon(0, LucideIcons.home, "Home"),
+              _buildIcon(1, LucideIcons.shield, "Services"),
+              _buildIcon(2, LucideIcons.monitor, "Monitoring"),
+              _buildIcon(3, LucideIcons.settings, "Settings"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-          return BottomNavigationBarItem(
-            icon: AnimatedBuilder(
-              animation: _jumpAnimations[index],
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(0, _jumpAnimations[index].value),
-                  child: child,
-                );
-              },
-              child: Icon(iconData),
+  Widget _buildIcon(int index, IconData iconData, String label) {
+    final isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            iconData,
+            size: 28,
+            color: isSelected ? const Color.fromARGB(255, 255, 214, 102) : Colors.black,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? const Color.fromARGB(255, 255, 214, 102) : Colors.black,
+              fontSize: 12,
             ),
-            label: label,
-          );
-        }),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildNavItem(int index, IconData iconData, String label) {
+    final isSelected = _selectedIndex == index;
+    
+    return Flexible(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedBuilder(
+                animation: _scaleAnimations[index],
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scaleAnimations[index].value,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          color: const Color(0xFFFFCC29).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(15),
+                        )
+                      : null,
+                  child: Icon(
+                    iconData,
+                    color: isSelected ? const Color(0xFFFFCC29) : const Color(0xFF1C2B66),
+                    size: 24,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFFFFCC29) : const Color(0xFF1C2B66),
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

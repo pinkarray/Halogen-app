@@ -21,6 +21,7 @@ import 'modules/services/secured_mobility/service_configuration_screen.dart';
 import 'modules/services/secured_mobility/schedule_service_screen.dart';
 import "modules/services/secured_mobility/confirm_order_screen.dart";
 import 'modules/services/secured_mobility/payment_screen.dart';
+import 'modules/services/secured_mobility/payment_success_screen.dart';
 import 'modules/services/outsourcing_talent/desired_services/desired_services_screen.dart';
 import 'modules/services/outsourcing_talent/outsourcing_talent_screen.dart';
 import 'modules/services/outsourcing_talent/description_of_need_screen.dart';
@@ -174,6 +175,7 @@ class HalogenApp extends StatelessWidget {
             (context) => const ScheduleServiceScreen(),
         '/secured-mobility/summary': (context) => const ConfirmOrderScreen(),
         '/secured-mobility/payment': (context) => const PaymentScreen(),
+        '/secured-mobility/payment-success': (context) => const PaymentSuccessScreen(),
         '/outsourcing-talent/desired-services':
             (context) => const OutsourcingDesiredServicesScreen(),
         '/outsourcing-talent': (context) => const OutsourcingTalentScreen(),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:pay_with_paystack/pay_with_paystack.dart';
+import 'package:uuid/uuid.dart';
 import 'providers/secured_mobility_provider.dart';
 import '../../../shared/widgets/halogen_back_button.dart';
 import '../../../shared/widgets/glowing_arrows_button.dart';
@@ -15,6 +17,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   String? selectedMethod;
+  bool isLoading = false;
 
   void _showBankTransferBottomSheet(BuildContext context, int amount) {
     showModalBottomSheet(
@@ -74,13 +77,61 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 final provider = context.read<SecuredMobilityProvider>();
                 provider.markStageComplete(5);
                 Navigator.of(context).pop();
-                Navigator.of(context).pushNamedAndRemoveUntil('/services', (_) => false);
+                Navigator.of(context).pushNamed('/secured-mobility/payment-success');
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _processPaystackPayment(int amount, {bool isTransfer = false}) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Generate a unique reference for this transaction
+      final uuid = Uuid();
+      final reference = uuid.v4();
+      
+      // Replace with your actual Paystack secret key (not public key)
+      const secretKey = 'sk_test_your_secret_key_here'; // Get this from your Paystack dashboard
+      
+      await PayWithPayStack().now(
+        context: context,
+        secretKey: secretKey, // Use secret key here, not public key
+        customerEmail: 'customer@example.com', // Replace with actual user email
+        reference: reference,
+        currency: 'NGN',
+        amount: amount.toDouble(),
+        callbackUrl: 'https://halogen.com/callback',
+        // If it's a bank transfer, specify the payment channel
+        paymentChannel: isTransfer ? ["bank_transfer"] : null,
+        transactionCompleted: (paymentData) {
+          // Payment was successful
+          final provider = context.read<SecuredMobilityProvider>();
+          provider.markStageComplete(5);
+          Navigator.of(context).pushNamed('/secured-mobility/payment-success');
+        },
+        transactionNotCompleted: (String reason) {
+          // Payment failed
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment was not completed: $reason')),
+          );
+        },
+      );
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error processing payment: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   String formatCurrency(int amount) {
@@ -167,23 +218,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const SizedBox(height: 12),
                 _paymentOption('Wallet'),
                 _paymentOption('Bank Transfer'),
+                _paymentOption('Card Payment'),
                 const SizedBox(height: 32),
                 Center(
-                  child: GlowingArrowsButton(
-                    text: 'Pay ${formatCurrency(totalCost)}',
-                    onPressed: () {
-                      if (selectedMethod == 'Bank Transfer') {
-                        _showBankTransferBottomSheet(context, totalCost);
-                      } else if (selectedMethod == 'Wallet') {
-                        provider.markStageComplete(5);
-                        Navigator.of(context).pushNamedAndRemoveUntil('/services', (_) => false);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please select a payment method')),
-                        );
-                      }
-                    },
-                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator()
+                      : GlowingArrowsButton(
+                          text: 'Pay ${formatCurrency(totalCost)}',
+                          onPressed: () {
+                            if (selectedMethod == 'Bank Transfer') {
+                              // Use Paystack for bank transfers instead of showing bank details
+                              _processPaystackPayment(totalCost, isTransfer: true);
+                            } else if (selectedMethod == 'Wallet') {
+                              provider.markStageComplete(5);
+                              Navigator.of(context).pushNamed('/secured-mobility/payment-success');
+                            } else if (selectedMethod == 'Card Payment') {
+                              _processPaystackPayment(totalCost);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please select a payment method')),
+                              );
+                            }
+                          },
+                        ),
                 ),
               ],
             ),
