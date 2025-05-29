@@ -7,6 +7,7 @@ import '../../../shared/helpers/session_manager.dart';
 class SecurityProfileProvider with ChangeNotifier {
   final Map<String, List<QuestionModel>> _sectionQuestions = {};
   final Map<String, dynamic> _answers = {};
+  final Set<int> completedChildIndices = {};
 
   bool _showSpouseProfile = false;
   bool _isLoading = false;
@@ -51,13 +52,19 @@ class SecurityProfileProvider with ChangeNotifier {
           final sectionCode = section['ref_code'];
           final questionsJson = section['questions'] as List;
 
-          final questions = questionsJson
-              .map((q) => QuestionModel.fromJson(q))
-              .toList();
+          final Map<String, QuestionModel> uniqueQuestions = {};
 
-          print('[Section: $sectionCode] Loaded ${questions.length} questions');
+          for (final q in questionsJson) {
+            final question = QuestionModel.fromJson(q);
+            final ref = question.refCode.trim();
+            if (uniqueQuestions.containsKey(ref)) {
+              print('[DUPLICATE] $ref already exists in section $sectionCode');
+            } else {
+              uniqueQuestions[ref] = question;
+            }
+          }
 
-          _sectionQuestions[sectionCode] = questions;
+          final questions = uniqueQuestions.values.toList();
 
           if (sectionCode == 'SP-PP') {
             const List<String> questionOrder = [
@@ -67,18 +74,23 @@ class SecurityProfileProvider with ChangeNotifier {
               'SP-PP-GD',
               'SP-PP-MS',
               'SP-PP-AG',
+              'SP-PP-CC',
+              'SP-PP-CC-NN',
+              'SP-PP-CC-NN-AR',
+              'SP-PP-CC-NN-SI',
             ];
 
-            _sectionQuestions[sectionCode]!.sort((a, b) {
+            questions.sort((a, b) {
               final indexA = questionOrder.indexOf(a.refCode);
               final indexB = questionOrder.indexOf(b.refCode);
-
               if (indexA == -1 && indexB == -1) return 0;
               if (indexA == -1) return 1;
               if (indexB == -1) return -1;
               return indexA.compareTo(indexB);
             });
           }
+
+          _sectionQuestions[sectionCode] = questions;
         }
       } else {
         print('[fetchQuestions] Failed with body: ${response.body}');
@@ -96,10 +108,76 @@ class SecurityProfileProvider with ChangeNotifier {
   void saveAnswer(String questionId, dynamic answer) {
     _answers[questionId] = answer;
 
+    // Update spouse toggle
     if (questionId == 'SP-PP-MS') {
       _showSpouseProfile = answer == 'Married';
     }
 
     notifyListeners();
+  }
+
+  void removeAnswer(String questionId) {
+    if (_answers.containsKey(questionId)) {
+      _answers.remove(questionId);
+      notifyListeners();
+    }
+  }
+
+  void clearChildAnswersAbove(int count, List<QuestionModel> childQuestions) {
+    // Removes answers and marks after a reduced child count
+    completedChildIndices.removeWhere((i) => i >= count);
+    for (int i = count; i < 20; i++) {
+      for (var q in childQuestions) {
+        final key = '${q.id}-$i';
+        _answers.remove(key);
+      }
+    }
+    notifyListeners();
+  }
+
+  void markChildCompleted(int index) {
+    completedChildIndices.add(index);
+    notifyListeners();
+  }
+
+  bool isChildCompleted(int index, List<QuestionModel> childQuestions) {
+    for (var q in childQuestions) {
+      final key = '${q.id}-$index';
+      if (!_answers.containsKey(key) || _answers[key]!.toString().trim().isEmpty) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  final Set<int> completedCookIndices = {};
+  final Set<int> completedNannyIndices = {};
+  final Set<int> completedDriverIndices = {};
+  final Set<int> completedGateManIndices = {};
+
+  List<QuestionModel> get allQuestions {
+    return _sectionQuestions.values.expand((qList) => qList).toList();
+  }
+
+  List<QuestionModel> getAllOrderedQuestions(String sectionCode) {
+    return _sectionQuestions[sectionCode] ?? [];
+  }
+
+  List<QuestionModel> getChildQuestions(String baseCode) {
+    return _sectionQuestions.values
+        .expand((qList) => qList)
+        .where((q) => q.baseCode == baseCode)
+        .toList();
+  }
+
+  void resetAnswers() {
+    _answers.clear();
+    completedChildIndices.clear();
+    _showSpouseProfile = false;
+    notifyListeners();
+  }
+
+  void clearCompletedIndicesAbove(int count, Set<int> indices) {
+    indices.removeWhere((i) => i >= count);
   }
 }

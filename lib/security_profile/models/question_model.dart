@@ -8,7 +8,7 @@ class QuestionModel {
   final String baseCode;
   final String? groupLabel;
   final String? answerModule;
-  final List<OptionModel> options; // ✅ embedded options
+  final List<OptionModel> options; 
 
   QuestionModel({
     required this.id,
@@ -18,7 +18,7 @@ class QuestionModel {
     required this.baseCode,
     this.groupLabel,
     this.answerModule,
-    this.options = const [], // default to empty
+    this.options = const [], 
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +34,18 @@ class QuestionModel {
               ?.map((o) => OptionModel.fromJson(o))
               .toList() ??
           [],
+    );
+  }
+  factory QuestionModel.empty() {
+    return QuestionModel(
+      id: '',
+      question: '',
+      type: '',
+      refCode: '',
+      baseCode: '',
+      groupLabel: null,
+      answerModule: null,
+      options: [],
     );
   }
 }

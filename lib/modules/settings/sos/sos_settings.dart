@@ -40,7 +40,7 @@ class _SosSettingsScreenState extends State<SosSettingsScreen> {
           children: [
             _sectionTitle("Trigger Method"),
             _buildToggleTile(
-              title: "Triple-press Power Button",
+              title: "Long Press From Phone Menu",
               value: powerButtonTrigger,
               onChanged: (val) => setState(() => powerButtonTrigger = val),
               icon: Icons.power_settings_new,
