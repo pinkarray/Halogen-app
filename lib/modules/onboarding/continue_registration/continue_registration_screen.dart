@@ -938,10 +938,10 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
                                             title: "Spouse’s Mother",
                                             mainRefCode: 'SP-OTH-S-M',
                                             detailRefCodes: [
-                                              'SP-OTH-S-M-AG',
-                                              'SP-OTH-S-M-ST',
-                                              'SP-OTH-S-M-LGA',
-                                              'SP-OTH-S-M-AA',
+                                                'SP-OTH-S-M-AG',
+                                                'SP-OTH-S-M-AA', 
+                                                'SP-OTH-S-M-LGA',
+                                                'SP-OTH-S-M-ST',
                                           ],
                                         ),
                                       ]

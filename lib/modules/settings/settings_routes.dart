@@ -7,8 +7,10 @@ import 'terms/terms_and_conditions_screen.dart';
 import 'privacy_policy/privacy_policy_screen.dart';
 import 'support/support_screen.dart';
 import 'sos/sos_settings.dart';
-import 'sos/emergency_contacts_screen.dart'; // Add this import
-
+import 'sos/emergency_contacts_screen.dart';
+import 'notification_settings/notification_settings.dart';
+import 'active_services/active_services_screen.dart';
+import 'app_theme/theme_settings_screen.dart';
 
 final Map<String, WidgetBuilder> settingsRoutes = {
   '/profile': (context) => const ProfileScreen(),
@@ -19,5 +21,8 @@ final Map<String, WidgetBuilder> settingsRoutes = {
   '/privacy': (_) => const PrivacyPolicyScreen(),
   '/support': (_) => const SupportScreen(),
   '/sos-settings': (context) => const SosSettingsScreen(),
-  '/emergency-contacts': (context) => const EmergencyContactsScreen(), // Add this route
+  '/emergency-contacts': (context) => const EmergencyContactsScreen(),
+  '/notification-settings': (context) => const NotificationSettingsScreen(),
+  '/active-services': (context) => const ActiveServicesScreen(),
+  '/theme-settings': (context) => const ThemeSettingsScreen(),
 };

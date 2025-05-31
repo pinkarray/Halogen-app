@@ -119,7 +119,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       MaterialPageRoute(builder: (_) => const WalletCheckWrapper()),
                     );
                   }),
-                  _buildSettingTile(Icons.notifications_none, "Notification", () {}),
+                  _buildSettingTile(Icons.notifications_none, "Notifications", () {
+                    Navigator.pushNamed(context, '/notification-settings');
+                  }),
+
                 ]),
 
                 const SizedBox(height: 20),
@@ -128,13 +131,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildSettingTile(Icons.warning_amber_outlined, "SOS Settings", () {
                     Navigator.pushNamed(context, '/sos-settings');
                   }),
-                  _buildSettingTile(Icons.shield_outlined, "View Active Services", () {}),
+                  _buildSettingTile(Icons.shield_outlined, "View Active Services", () {
+                    Navigator.pushNamed(context, '/active-services');
+                  }),
                 ]),
 
                 const SizedBox(height: 20),
                 _sectionTitle("Preferences"),
                 _settingsGroup([
-                  _buildSettingTile(Icons.dark_mode_outlined, "App Theme", () {}),
+                  _buildSettingTile(Icons.dark_mode_outlined, "App Theme", () {
+                    Navigator.pushNamed(context, '/theme-settings');
+                  }),
                   _buildSettingTile(Icons.language_outlined, "Language", () {}),
                 ]),
 

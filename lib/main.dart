@@ -30,6 +30,8 @@ import 'modules/settings/settings_routes.dart';
 import 'modules/settings/settings_screen.dart';
 import 'modules/settings/profile/provider/profile_provider.dart';
 import 'security_profile/providers/security_profile_provider.dart';
+import 'modules/settings/provider/settings_provider.dart';
+import 'providers/theme_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +49,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => WalletProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => SecurityProfileProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const HalogenApp(),
     ),
@@ -58,9 +62,11 @@ class HalogenApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
     return MaterialApp(
       title: "Halogen",
       debugShowCheckedModeBanner: false,
+      themeMode: themeProvider.themeMode,
       theme: ThemeData(
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
@@ -73,11 +79,14 @@ class HalogenApp extends StatelessWidget {
           backgroundColor: Colors.white,
           hourMinuteTextColor: Colors.black,
           dayPeriodTextColor: Colors.black,
-          dayPeriodShape: RoundedRectangleBorder(), // Optional for rounded button
-        dayPeriodColor: WidgetStateColor.resolveWith((states) =>
-          states.contains(WidgetState.selected)
-            ? const Color(0xFFFFCC29)
-            : Colors.white),
+          dayPeriodShape:
+              RoundedRectangleBorder(), // Optional for rounded button
+          dayPeriodColor: WidgetStateColor.resolveWith(
+            (states) =>
+                states.contains(WidgetState.selected)
+                    ? const Color(0xFFFFCC29)
+                    : Colors.white,
+          ),
           // Default background when not selected
           dialHandColor: Colors.black,
           dialBackgroundColor: Color(0xFFEDEDED),
@@ -88,29 +97,29 @@ class HalogenApp extends StatelessWidget {
           ),
         ),
         datePickerTheme: DatePickerThemeData(
-        backgroundColor: Colors.white,
-        headerForegroundColor: Colors.black,
+          backgroundColor: Colors.white,
+          headerForegroundColor: Colors.black,
 
-        // 🔘 Today styling (black circle)
-        todayBackgroundColor: WidgetStatePropertyAll(Colors.black),
-        todayForegroundColor: WidgetStatePropertyAll(Colors.white),
+          // 🔘 Today styling (black circle)
+          todayBackgroundColor: WidgetStatePropertyAll(Colors.black),
+          todayForegroundColor: WidgetStatePropertyAll(Colors.white),
 
-        // ✅ Selected day styling (brand yellow circle with black text)
-        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return const Color(0xFFFFCC29); // brand yellow
-          }
-          return null; // fallback to default
-        }),
-        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
+          // ✅ Selected day styling (brand yellow circle with black text)
+          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const Color(0xFFFFCC29); // brand yellow
+            }
+            return null; // fallback to default
+          }),
+          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.black;
+            }
             return Colors.black;
-          }
-          return Colors.black;
-        }),
+          }),
 
-        dayOverlayColor: WidgetStatePropertyAll(Colors.transparent),
-      ),
+          dayOverlayColor: WidgetStatePropertyAll(Colors.transparent),
+        ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             foregroundColor: Colors.black, // Cancel/OK buttons
@@ -142,9 +151,9 @@ class HalogenApp extends StatelessWidget {
         radioTheme: RadioThemeData(
           fillColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return const Color(0xFF1C2B66); 
+              return const Color(0xFF1C2B66);
             }
-            return const Color(0xFF1C2B66); 
+            return const Color(0xFF1C2B66);
           }),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -154,7 +163,6 @@ class HalogenApp extends StatelessWidget {
             textStyle: const TextStyle(fontFamily: 'Objective'),
           ),
         ),
-        
       ),
       initialRoute: '/splash',
       routes: {
@@ -175,7 +183,8 @@ class HalogenApp extends StatelessWidget {
             (context) => const ScheduleServiceScreen(),
         '/secured-mobility/summary': (context) => const ConfirmOrderScreen(),
         '/secured-mobility/payment': (context) => const PaymentScreen(),
-        '/secured-mobility/payment-success': (context) => const PaymentSuccessScreen(),
+        '/secured-mobility/payment-success':
+            (context) => const PaymentSuccessScreen(),
         '/outsourcing-talent/desired-services':
             (context) => const OutsourcingDesiredServicesScreen(),
         '/outsourcing-talent': (context) => const OutsourcingTalentScreen(),

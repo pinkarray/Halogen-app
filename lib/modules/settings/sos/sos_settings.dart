@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:halogen/shared/widgets/halogen_back_button.dart';
-import 'emergency_contacts_screen.dart'; // Add this import
+// Add this import
 
 class SosSettingsScreen extends StatefulWidget {
   const SosSettingsScreen({super.key});

@@ -3,9 +3,7 @@ import 'package:halogen/modules/dashboard/dashboard_screen.dart';
 import 'package:halogen/modules/services/services_screen.dart';
 import 'package:halogen/modules/settings/settings_screen.dart';
 import 'package:halogen/screens/monitoring_services_screen.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'dart:ui';
 
 class HomeWrapper extends StatefulWidget {
   final int initialIndex;

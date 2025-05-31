@@ -96,8 +96,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final uuid = Uuid();
       final reference = uuid.v4();
       
-      // Replace with your actual Paystack secret key (not public key)
-      const secretKey = 'sk_test_your_secret_key_here'; // Get this from your Paystack dashboard
+      const secretKey = 'sk_test_9fb37d4abb5aa1d55a16d6f604f6e69298e1709e'; // Get this from your Paystack dashboard
       
       await PayWithPayStack().now(
         context: context,
@@ -227,7 +226,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           text: 'Pay ${formatCurrency(totalCost)}',
                           onPressed: () {
                             if (selectedMethod == 'Bank Transfer') {
-                              // Use Paystack for bank transfers instead of showing bank details
                               _processPaystackPayment(totalCost, isTransfer: true);
                             } else if (selectedMethod == 'Wallet') {
                               provider.markStageComplete(5);

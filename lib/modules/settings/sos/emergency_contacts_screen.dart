@@ -12,7 +12,7 @@ class EmergencyContactsScreen extends StatefulWidget {
 }
 
 class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
-  List<Contact> _emergencyContacts = [];
+  final List<Contact> _emergencyContacts = [];
   List<Contact> _deviceContacts = [];
   bool _isLoading = true;
   bool _hasPermission = false;
@@ -190,8 +190,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFF1C2B66),
                     child: Text(
-                      contact.displayName?.isNotEmpty == true
-                          ? contact.displayName![0].toUpperCase()
+                      contact.displayName.isNotEmpty == true
+                          ? contact.displayName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(color: Colors.white),
                     ),
@@ -201,8 +201,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
-                    contact.phones?.isNotEmpty == true
-                        ? contact.phones!.first.number ?? 'No phone'
+                    contact.phones.isNotEmpty == true
+                        ? contact.phones.first.number ?? 'No phone'
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),
@@ -258,8 +258,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFF1C2B66),
                     child: Text(
-                      contact.displayName?.isNotEmpty == true
-                          ? contact.displayName![0].toUpperCase()
+                      contact.displayName.isNotEmpty == true
+                          ? contact.displayName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(color: Colors.white),
                     ),
@@ -269,8 +269,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
-                    contact.phones?.isNotEmpty == true
-                        ? contact.phones!.first.number ?? 'No phone'
+                    contact.phones.isNotEmpty == true
+                        ? contact.phones.first.number ?? 'No phone'
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),
