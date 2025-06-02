@@ -24,6 +24,43 @@ class SecurityProfileProvider with ChangeNotifier {
 
   final String baseUrl = 'http://185.203.216.113:3004/api/v1/security-profile';
 
+  Future<void> createOrFetchSecurityProfile() async {
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse(baseUrl); // GET by default
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('[SecurityProfile] Profile already exists.');
+        return; 
+      }
+
+      final createResponse = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (createResponse.statusCode == 201) {
+        print('[SecurityProfile] Profile created successfully');
+      } else {
+        print('[SecurityProfile] Creation failed: ${createResponse.body}');
+      }
+    } catch (e) {
+      print('[SecurityProfile] Error: $e');
+    }
+  }
+
+
   Future<void> fetchQuestions() async {
     _isLoading = true;
     notifyListeners();
@@ -120,6 +157,102 @@ class SecurityProfileProvider with ChangeNotifier {
     if (_answers.containsKey(questionId)) {
       _answers.remove(questionId);
       notifyListeners();
+    }
+  }
+
+  Future<void> submitAnswer({
+    required String questionId,
+    String? optionId,
+    required String value,
+    required String label,
+    Map<String, dynamic>? info,
+  }) async {
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse('$baseUrl/answers');
+
+    final body = {
+      "answers": [
+        {
+          "question_id": questionId,
+          "option_id": optionId,
+          "value": value,
+          "label": label,
+          "info": info ?? {}
+        }
+      ]
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('[submitAnswer] Answer sent successfully');
+      } else {
+        print('[submitAnswer] Failed: ${response.body}');
+      }
+    } catch (e) {
+      print('[submitAnswer] Error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSubmittedAnswers() async {
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse('$baseUrl/answers');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'] as List<dynamic>;
+        print('[fetchSubmittedAnswers] Retrieved ${data.length} answers');
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        print('[fetchSubmittedAnswers] Failed: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('[fetchSubmittedAnswers] Error: $e');
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchSecurityReport() async {
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse('$baseUrl/report');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final report = json.decode(response.body)['data'];
+        print('[fetchSecurityReport] Success');
+        return report;
+      } else {
+        print('[fetchSecurityReport] Failed: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('[fetchSecurityReport] Error: $e');
+      return null;
     }
   }
 

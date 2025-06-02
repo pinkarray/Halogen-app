@@ -6,12 +6,14 @@ class UserModel {
   final String email;
   final String phoneNumber;
   final String type;
+  final String? password;
 
   UserModel({
     required this.fullName,
     required this.email,
     required this.phoneNumber,
     required this.type,
+    this.password,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class UserModel {
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'] ?? '',
       type: json['type'] ?? '',
+      password: json['password']
     );
   }
 
@@ -29,6 +32,7 @@ class UserModel {
       'email': email,
       'phone_number': phoneNumber,
       'type': type,
+      if (password != null) 'password': password,
     };
   }
 
@@ -41,9 +45,9 @@ class UserModel {
     provider.updateFirstName(firstName);
     provider.updateLastName(lastName);
     provider.updateEmail(email);
-    provider.updateConfirmPassword(''); // reset
-    provider.updatePassword('');        // reset
-    provider.toggleCheckbox(true);      // assume consent
+    provider.updateConfirmPassword('');
+    provider.updatePassword('');    
+    provider.toggleCheckbox(true);
   }
 
   /// Autofill method for UserFormDataProvider

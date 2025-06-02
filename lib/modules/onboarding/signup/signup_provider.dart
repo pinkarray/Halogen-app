@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../models/user_model.dart';
 class SignUpProvider with ChangeNotifier {
   // User input fields
@@ -7,6 +9,7 @@ class SignUpProvider with ChangeNotifier {
   String email = '';
   String password = '';
   String confirmPassword = '';
+  String phoneNumber = '';
 
   // State flags
   bool isChecked = false;
@@ -46,6 +49,12 @@ class SignUpProvider with ChangeNotifier {
     isChecked = value ?? false;
     notifyListeners();
   }
+
+  void updatePhoneNumber(String value) {
+    phoneNumber = value;
+    notifyListeners();
+  }
+
 
   // Progress logic: return count of substeps completed (max 7)
   int get subStepCount {
@@ -99,11 +108,36 @@ class SignUpProvider with ChangeNotifier {
     errorMessage = null;
     notifyListeners();
 
+    final user = UserModel(
+      fullName: "$firstName $lastName",
+      email: email,
+      password: password,
+      type: 'client', 
+      phoneNumber: phoneNumber,
+    );
+
+    final url = Uri.parse('http://185.203.216.113:3004/api/v1/auth/register'); 
+
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
-      return true;
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "full_name": user.fullName,
+          "email": user.email,
+          "phone_number": user.phoneNumber,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        final responseBody = jsonDecode(response.body);
+        errorMessage = responseBody['message'] ?? 'Signup failed';
+        return false;
+      }
     } catch (e) {
-      errorMessage = 'Something went wrong. Try again.';
+      errorMessage = 'Network error: $e';
       return false;
     } finally {
       isLoading = false;
@@ -111,12 +145,4 @@ class SignUpProvider with ChangeNotifier {
     }
   }
 
-  UserModel toUserModel() {
-    return UserModel(
-      fullName: "$firstName $lastName",
-      email: email,
-      phoneNumber: '', // Add this if you collect it later
-      type: 'client',  // Or dynamic role logic
-    );
-  }
 }

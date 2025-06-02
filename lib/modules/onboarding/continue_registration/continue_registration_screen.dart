@@ -5,6 +5,7 @@ import '../../../security_profile/providers/security_profile_provider.dart';
 import '../../../shared/widgets/custom_progress_bar.dart';
 import '../../../security_profile/widgets/dynamic_question_widget.dart';
 import '../../../security_profile/models/question_model.dart';
+import './security_report_screen.dart';
 
 class ContinueRegistrationScreen extends StatefulWidget {
   const ContinueRegistrationScreen({super.key});
@@ -26,6 +27,7 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
   ];
 
   int? expandedIndex;
+  bool _isInitializing = true;
 
   List<Widget> _buildProfileQuestions(BuildContext context) {
     final provider = context.watch<SecurityProfileProvider>();
@@ -564,8 +566,23 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SecurityProfileProvider>().fetchQuestions();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeRegistration());
+  }
+
+  Future<void> _initializeRegistration() async {
+    final provider = context.read<SecurityProfileProvider>();
+
+    try {
+      await provider.createOrFetchSecurityProfile();
+      await provider.fetchQuestions();
+      
+      await provider.fetchSubmittedAnswers();
+    } catch (e) {
+      print('[ContinueRegistration] Initialization error: $e');
+    }
+
+    setState(() {
+      _isInitializing = false;
     });
   }
 
@@ -573,6 +590,12 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
   Widget build(BuildContext context) {
     final completedSections =
         context.watch<UserFormDataProvider>().allSections.keys.toSet();
+    final requiredSections = {
+      "A", "B", "C", "D", "E", "F", "G"
+    }; // A-G match your tiles
+
+    final canViewReport = requiredSections.every(completedSections.contains);
+
     final profileProvider = context.watch<SecurityProfileProvider>();
 
     return Scaffold(
@@ -585,7 +608,9 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
+      body: _isInitializing
+    ? const Center(child: CircularProgressIndicator())
+    : Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
@@ -944,15 +969,46 @@ class _ContinueRegistrationScreenState extends State<ContinueRegistrationScreen>
                                                 'SP-OTH-S-M-ST',
                                           ],
                                         ),
+                                        if (canViewReport)
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 16.0),
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (_) => const SecurityReportScreen()),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: const Color(0xFF1C2B66), // Halogen Blue
+                                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  "View Report",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily: 'Objective',
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                        const Padding(
+                                          padding: EdgeInsets.only(bottom: 80),
+                                          child: SizedBox(),
+                                        ),
                                       ]
                                     ],
                                   ),
                                 ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 80), // allows gentle scroll beyond last item
-                              child: SizedBox(),
-                            ),
-
                           ],
                         ),
                       ),
