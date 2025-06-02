@@ -33,14 +33,30 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<bool> logout() async {
-    final token = await SessionManager.getAuthToken();
-    if (token == null) return false;
+    try {
+      final token = await SessionManager.getAuthToken();
 
-    final success = await ProfileApiService.logout(token);
-    if (success) {
+      // Attempt API logout only if token exists (from actual login)
+      if (token != null) {
+        await ProfileApiService.logout(token);
+      }
+
+      // Always clear local session and state
       await SessionManager.clearSession();
       clear();
+
+      // Optional: also clear secure storage
+      // await SecureStorageService().clearCredentials();
+
+      return true;
+    } catch (e) {
+      print('❌ Logout error: $e');
+
+      // Still clear session locally even if logout API fails
+      await SessionManager.clearSession();
+      clear();
+
+      return true;
     }
-    return success;
   }
 }

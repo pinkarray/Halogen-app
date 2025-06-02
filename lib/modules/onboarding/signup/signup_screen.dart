@@ -83,6 +83,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                   label: 'First Name',
                   controller: firstNameController,
                   icon: Icons.person,
+                  textCapitalization: TextCapitalization.words,
                     onChanged: (val) {
                       signUpProvider.updateFirstName(val);
                       userFormProvider.updateFirstName(val);
@@ -94,6 +95,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                   label: 'Last Name',
                   controller: lastNameController,
                   icon: Icons.person_outline,
+                  textCapitalization: TextCapitalization.words,
                   onChanged: (val) {
                     signUpProvider.updateLastName(val);
                     userFormProvider.updateLastName(val);
@@ -180,81 +182,69 @@ class SignUpScreenState extends State<SignUpScreen> {
 
                 const SizedBox(height: 20),
 
-                Center(
+                                Center(
                   child: Hero(
                     tag: 'auth-button',
                     child: SizedBox(
                       width: 200,
                       child: ElevatedButton(
-                        onPressed:
-                            signUpProvider.isChecked &&
-                                    !signUpProvider.isLoading
-                                ? () async {
-                                  final success =
-                                      await signUpProvider.submitForm();
-                                  if (success && mounted) {
-                                              userFormProvider.updateFirstName(signUpProvider.firstName);
-                                    userFormProvider.updateLastName(signUpProvider.lastName);
-                                    userFormProvider.updateEmail(signUpProvider.email);
-                                    userFormProvider.updatePassword(signUpProvider.password);
-                                    userFormProvider.toggleCheckbox(signUpProvider.isChecked);
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        transitionDuration: const Duration(
-                                          milliseconds: 900,
-                                        ),
-                                        pageBuilder:
-                                            (_, __, ___) =>
-                                                const PhoneVerificationScreen(),
-                                        transitionsBuilder:
-                                            (_, animation, __, child) =>
-                                                FadeTransition(
-                                                  opacity: animation,
-                                                  child: child,
-                                                ),
-                                      ),
-                                    );
-                                  } else {
-                                    if (signUpProvider.password !=
-                                        signUpProvider.confirmPassword) {
-                                      _passwordFieldKey.currentState?.shake();
-                                      _confirmPasswordFieldKey.currentState
-                                          ?.shake();
-                                    }
-                                  }
+                        onPressed: signUpProvider.isChecked &&
+                                !signUpProvider.isLoading
+                            ? () {
+                                if (signUpProvider.password !=
+                                    signUpProvider.confirmPassword) {
+                                  _passwordFieldKey.currentState?.shake();
+                                  _confirmPasswordFieldKey.currentState
+                                      ?.shake();
+                                  return;
                                 }
-                                : null,
+
+                                // ✅ Update form data to provider
+                                userFormProvider.updateFirstName(signUpProvider.firstName);
+                                userFormProvider.updateLastName(signUpProvider.lastName);
+                                userFormProvider.updateEmail(signUpProvider.email);
+                                userFormProvider.updatePassword(signUpProvider.password);
+                                userFormProvider.toggleCheckbox(signUpProvider.isChecked);
+
+                                // ✅ Navigate to OTP screen
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration: const Duration(milliseconds: 900),
+                                    pageBuilder: (_, __, ___) =>
+                                        const PhoneVerificationScreen(),
+                                    transitionsBuilder: (_, animation, __, child) =>
+                                        FadeTransition(opacity: animation, child: child),
+                                  ),
+                                );
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
-                          backgroundColor:
-                              signUpProvider.isChecked
-                                  ? Color(0xFF1C2B66)
-                                  : Colors.grey[300],
+                          backgroundColor: signUpProvider.isChecked
+                              ? const Color(0xFF1C2B66)
+                              : Colors.grey[300],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child:
-                            signUpProvider.isLoading
-                                ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                                : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'Continue',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                        fontFamily: 'Objective',
-                                      ),
+                        child: signUpProvider.isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'Continue',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontFamily: 'Objective',
                                     ),
-                                    SizedBox(width: 10),
-                                    GlowingArrows(),
-                                  ],
-                                ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  GlowingArrows(),
+                                ],
+                              ),
                       ),
                     ),
                   ),

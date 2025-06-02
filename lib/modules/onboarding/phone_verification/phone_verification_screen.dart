@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/secure_storage_service.dart';
 import '../../../providers/user_form_data_provider.dart';
 import '../otp_verification/otp_verification_screen.dart';
 import '../../../shared/widgets/custom_progress_bar.dart';
@@ -32,9 +33,9 @@ class PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     }
 
     _phoneController.addListener(() {
-      final fullPhone = '$selectedCountryCode${_phoneController.text.trim()}';
-      provider.updatePhone(fullPhone);
-      setState(() {}); 
+      final raw = _phoneController.text.trim(); 
+      provider.updatePhone(raw); 
+      setState(() {});
     });
   }
 
@@ -121,11 +122,15 @@ class PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                   return;
                                 }
 
-                                if (selectedCountryCode == '+234' &&
-                                    _phoneController.text.trim().length != 10) {
+                                final raw = _phoneController.text.trim();
+                                final isNigeria = selectedCountryCode == '+234';
+                                final digitsOnly = raw.replaceAll(RegExp(r'\D'), '');
+                                final isValidLength = isNigeria ? digitsOnly.length == 11 && digitsOnly.startsWith('0') : true;
+
+                                if (!isValidLength) {
                                   FocusScope.of(context).unfocus();
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Nigerian phone numbers must be 10 digits')),
+                                    const SnackBar(content: Text('Nigerian phone numbers must be 11 digits and start with 0')),
                                   );
                                   return;
                                 }
@@ -133,14 +138,33 @@ class PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                 setState(() => _isLoading = true);
 
                                 try {
-                                  final fullPhoneNumber =
-                                      '$selectedCountryCode${_phoneController.text.trim()}';
+                                  final raw = _phoneController.text.trim();
 
-                                  final result = await sendOtp(phoneNumber: fullPhoneNumber);
+                                  print('📨 Sending to /auth/register →');
+                                  print('Full name: ${provider.firstName} ${provider.lastName}');
+                                  print('Phone: $raw'); // the actual value you're about to send
+                                  print('Email: ${provider.email}');
 
-                                  provider.updatePhone(fullPhoneNumber);
+                                  final result = await registerUser(
+                                    fullName: "${provider.firstName} ${provider.lastName}",
+                                    phoneNumber: raw, // use raw input here
+                                    email: provider.email ?? "",
+                                  );
+
+                                  print('📬 Register response: $result');
+
+                                  provider.updatePhone(raw); // update it after confirming it's the final value
+
                                   if (result.containsKey("confirmation_id")) {
                                     provider.saveConfirmationId(result["confirmation_id"]);
+
+                                    final password = provider.password;
+                                    if (password != null && password.isNotEmpty) {
+                                      await SecureStorageService().saveUserCredentials(
+                                        raw,
+                                        password,
+                                      );
+                                    }
                                   }
 
                                   if (!mounted) return;

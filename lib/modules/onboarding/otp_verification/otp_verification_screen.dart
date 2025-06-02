@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../services/auth_service.dart';
+import 'package:sms_autofill/sms_autofill.dart';
+import '../../../services/secure_storage_service.dart';
 import '../../../providers/user_form_data_provider.dart';
 import '../account_creation/account_creation_screen.dart';
 import '../../../shared/widgets/custom_progress_bar.dart';
@@ -10,7 +12,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../shared/helpers/session_manager.dart';
 import 'dart:async';
 
-
 class OTPVerificationScreen extends StatefulWidget {
   const OTPVerificationScreen({super.key});
 
@@ -18,17 +19,22 @@ class OTPVerificationScreen extends StatefulWidget {
   OTPVerificationScreenState createState() => OTPVerificationScreenState();
 }
 
-class OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  final List<TextEditingController> _otpControllers =
-      List.generate(4, (index) => TextEditingController());
+class OTPVerificationScreenState extends State<OTPVerificationScreen>
+    with CodeAutoFill {
+  final List<TextEditingController> _otpControllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
   bool _isLoading = false;
   int _resendCooldown = 60;
   bool _isResendAvailable = false;
   late Timer _resendTimer;
+  String _otpCode = "";
 
   @override
   void initState() {
     super.initState();
+    listenForCode();
     _startResendCooldown();
     context.read<UserFormDataProvider>().updateSignUpStep(3);
   }
@@ -41,7 +47,21 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
     if (_resendTimer.isActive) {
       _resendTimer.cancel();
     }
+    cancel();
     super.dispose();
+  }
+
+  @override
+  void codeUpdated() {
+    final receivedCode = code ?? '';
+    setState(() {
+      _otpCode = receivedCode;
+    });
+
+    // Autofill the text fields
+    for (int i = 0; i < _otpControllers.length && i < receivedCode.length; i++) {
+      _otpControllers[i].text = receivedCode[i];
+    }
   }
 
   void _startResendCooldown() {
@@ -70,9 +90,9 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
     final provider = context.read<UserFormDataProvider>();
 
     if (provider.phoneNumber?.isEmpty ?? true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Phone number is missing.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Phone number is missing.")));
       return;
     }
 
@@ -82,7 +102,7 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
     try {
       final result = await sendOtp(phoneNumber: provider.phoneNumber!);
-      if (!mounted) return; 
+      if (!mounted) return;
 
       if (result.containsKey("confirmation_id")) {
         provider.saveConfirmationId(result["confirmation_id"]);
@@ -97,9 +117,9 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to resend OTP: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to resend OTP: $e")));
       }
     } finally {
       if (mounted) {
@@ -112,7 +132,6 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: true,
@@ -126,10 +145,7 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFFAEA),
-              Colors.white,
-            ],
+            colors: [Color(0xFFFFFAEA), Colors.white],
           ),
         ),
         child: SafeArea(
@@ -140,7 +156,10 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
               children: [
                 CustomProgressBar(
                   currentStep: 1,
-                  percent: context.watch<UserFormDataProvider>().stage1ProgressPercent,
+                  percent:
+                      context
+                          .watch<UserFormDataProvider>()
+                          .stage1ProgressPercent,
                 ).animate().fade(duration: 600.ms),
 
                 const SizedBox(height: 20),
@@ -151,7 +170,7 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Objective',
-                    color: Colors.black,
+                    color: Color(0xFF1C2B66),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -166,45 +185,24 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
                 const SizedBox(height: 20),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(
-                    4,
-                    (index) => SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: TextField(
-                        controller: _otpControllers[index],
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        maxLength: 1,
-                        cursorColor: Colors.black,
-                        onChanged: (value) {
-                          if (value.isNotEmpty && index < 3) {
-                            FocusScope.of(context).nextFocus();
-                          } else if (value.isEmpty && index > 0) {
-                            FocusScope.of(context).previousFocus(); 
-                          }
-                        },
-                        decoration: InputDecoration(
-                          counterText: "",
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.transparent),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.transparent),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.black, width: 2),
-                          ),
-                        ),
-                      ),
+                PinFieldAutoFill(
+                  codeLength: 6,
+                  currentCode: _otpCode,
+                  onCodeChanged: (code) {
+                    if (code != null && code.length <= 6) {
+                      setState(() => _otpCode = code);
+                    }
+                  },
+                  onCodeSubmitted: (code) {
+                    setState(() => _otpCode = code);
+                  },
+                  decoration: UnderlineDecoration(
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFF1C2B66),
+                      fontFamily: 'Objective',
                     ),
+                    colorBuilder: FixedColorBuilder(Colors.black),
                   ),
                 ),
 
@@ -222,25 +220,25 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     ),
                     _isResendAvailable
                         ? GestureDetector(
-                            onTap: _handleResendOtp,
-                            child: const Text(
-                              "Resend Code",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Objective',
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            "Wait ($_resendCooldown s)",
-                            style: const TextStyle(
+                          onTap: _handleResendOtp,
+                          child: const Text(
+                            "Resend Code",
+                            style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'Objective',
-                              color: Colors.grey,
+                              color: Color(0xFF1C2B66),
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                        )
+                        : Text(
+                          "Wait ($_resendCooldown s)",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Objective',
+                            color: Colors.grey,
+                          ),
+                        ),
                   ],
                 ).animate().fade(duration: 500.ms),
 
@@ -252,108 +250,142 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     child: SizedBox(
                       width: 200,
                       child: ElevatedButton(
-                        onPressed: _isLoading
-                            ? null
-                            : () async {
-                                final otpCode = _otpControllers.map((c) => c.text).join();
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : () async {
+                                  final otpCode = _otpCode;
 
-                                if (otpCode.length != 4) {
-                                  if (!mounted) return;
-                                  FocusScope.of(context).unfocus();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Please enter the complete OTP')),
-                                  );
-                                  return;
-                                }
+                                  if (_otpCode.length != 6) {
 
-                                final provider = context.read<UserFormDataProvider>();
-
-                                if ((provider.phoneNumber ?? "").isEmpty ||
-                                    (provider.confirmationId ?? "").isEmpty) {
-                                  if (!mounted) return;
-                                  FocusScope.of(context).unfocus();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Phone number or confirmation ID is missing')),
-                                  );
-                                  return;
-                                }
-
-                                if (!mounted) return;
-                                setState(() {
-                                  _isLoading = true;
-                                });
-
-                                try {
-                                  final response = await confirmOtp(
-                                    phoneNumber: provider.phoneNumber!,
-                                    otp: otpCode,
-                                  );
-
-                                  if (!mounted) return;
-                                  provider.markOtpVerified();
-                                  provider.saveConfirmationId(response['confirmation_id']);
-
-                                  final userModel = provider.toUserModel();
-                                  await SessionManager.saveUserModel(userModel);
-
-                                  // (Optional) Save to secure/session storage
-                                  // await SessionManager.saveUserProfile(userModel.toJson());
-
-                                  // Log or use for debug
-                                  debugPrint('✅ UserModel created: ${userModel.toJson()}');
-                                  if (!mounted) return;
-
-                                  Navigator.push(
-                                    
-                                    context,
-                                    PageRouteBuilder(
-                                      transitionDuration: const Duration(milliseconds: 900),
-                                      pageBuilder: (_, __, ___) => const AccountCreationScreen(),
-                                      transitionsBuilder: (_, animation, __, child) {
-                                        return FadeTransition(opacity: animation, child: child);
-                                      },
-                                    ),
-                                  );
-                                } catch (e) {
-                                  if (!mounted) return;
-                                  FocusScope.of(context).unfocus();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('OTP Verification failed: $e')),
-                                  );
-                                } finally {
-                                  if (mounted) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    if (!mounted) return;
+                                    FocusScope.of(context).unfocus();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Please enter the complete OTP',
+                                        ),
+                                      ),
+                                    );
+                                    return;
                                   }
-                                }
-                              },
+
+                                  final provider =
+                                      context.read<UserFormDataProvider>();
+
+                                  if ((provider.phoneNumber ?? "").isEmpty || _otpCode.length != 6) {
+                                    if (!mounted) return;
+                                    FocusScope.of(context).unfocus();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Phone number or OTP is missing or incomplete'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+
+                                  try {
+                                    print("📦 Confirming OTP with:");
+                                    print("Phone: ${provider.phoneNumber}");
+                                    print("OTP: $_otpCode");
+
+                                    final response = await confirmOtp(
+                                      phoneNumber: provider.phoneNumber!,
+                                      otp: otpCode,
+                                    );
+
+                                    print("✅ OTP confirmed. Response: $response");
+
+                                    if (!mounted) return;
+
+                                    final data = response['data'];
+                                      if (data != null && data.containsKey('confirmation_id')) {
+                                        provider.markOtpVerified();
+                                        provider.saveConfirmationId(data['confirmation_id']);
+                                        print("✅ confirmation_id saved: ${data['confirmation_id']}");
+                                      } else {
+                                        print("❌ confirmation_id missing in response data!");
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Something went wrong. Please try again.')),
+                                        );
+                                        return;
+                                      }
+
+                                    // Convert to user model
+                                    final userModel = provider.toUserModel();
+
+                                    // Save credentials for biometric login
+                                    final password = provider.password;
+                                    final phone = provider.phoneNumber;
+
+                                    if (password != null &&
+                                        password.isNotEmpty &&
+                                        phone != null &&
+                                        phone.isNotEmpty) {
+                                      await SecureStorageService().saveUserCredentials(phone, password);
+                                    }
+
+                                    await SessionManager.saveUserModel(userModel);
+                                    await SessionManager.saveUserProfile(userModel.toJson());
+
+                                    debugPrint('✅ UserModel created: ${userModel.toJson()}');
+
+                                    if (!mounted) return;
+
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        transitionDuration: const Duration(milliseconds: 900),
+                                        pageBuilder: (_, __, ___) => const AccountCreationScreen(),
+                                        transitionsBuilder: (_, animation, __, child) =>
+                                            FadeTransition(opacity: animation, child: child),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    FocusScope.of(context).unfocus();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('OTP Verification failed: $e')),
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _isLoading = false);
+                                    }
+                                  }
+                                },
 
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
-                          backgroundColor: Colors.black,
+                          backgroundColor: Color(0xFF1C2B66),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    "Continue",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontFamily: 'Objective',
+                        child:
+                            _isLoading
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      "Continue",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontFamily: 'Objective',
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  GlowingArrows(arrowColor: Colors.white),
-                                ],
-                              ),
+                                    SizedBox(width: 10),
+                                    GlowingArrows(arrowColor: Colors.white),
+                                  ],
+                                ),
                       ),
                     ),
                   ),

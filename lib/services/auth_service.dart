@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 const String baseUrl = "http://185.203.216.113:3004/api/v1";
 
+// 1️⃣ Register – Just triggers OTP
 Future<Map<String, dynamic>> registerUser({
   required String fullName,
   required String phoneNumber,
@@ -25,22 +26,7 @@ Future<Map<String, dynamic>> registerUser({
   return _handleResponse(response);
 }
 
-Future<Map<String, dynamic>> sendOtp({
-  required String phoneNumber,
-}) async {
-  final url = Uri.parse('$baseUrl/auth/send-otp');
-
-  final body = {"phone_number": phoneNumber};
-
-  final response = await http.post(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode(body),
-  );
-
-  return _handleResponse(response);
-}
-
+// 2️⃣ Confirm OTP – Returns confirmation_id (IMPORTANT!)
 Future<Map<String, dynamic>> confirmOtp({
   required String phoneNumber,
   required String otp,
@@ -61,7 +47,7 @@ Future<Map<String, dynamic>> confirmOtp({
   return _handleResponse(response);
 }
 
-// ✅ Create Password
+// 3️⃣ Create Password – Completes registration
 Future<Map<String, dynamic>> createPassword({
   required String confirmationId,
   required String password,
@@ -82,7 +68,47 @@ Future<Map<String, dynamic>> createPassword({
   return _handleResponse(response);
 }
 
-// ✅ Register Device
+// ➕ Optional: Resend OTP
+Future<Map<String, dynamic>> sendOtp({
+  required String phoneNumber,
+}) async {
+  final url = Uri.parse('$baseUrl/auth/send-otp');
+
+  final body = {"phone_number": phoneNumber};
+
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(body),
+  );
+
+  return _handleResponse(response);
+}
+
+// 🔐 Login
+Future<Map<String, dynamic>> loginUser({
+  required String phoneNumber,
+  required String password,
+  required String deviceId,
+}) async {
+  final url = Uri.parse('$baseUrl/auth/login');
+
+  final body = {
+    "phone_number": phoneNumber,
+    "password": password,
+    "device_id": deviceId,
+  };
+
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(body),
+  );
+
+  return _handleResponse(response);
+}
+
+// 📲 Register Device
 Future<Map<String, dynamic>> registerDevice({
   required String deviceToken,
   required String deviceType,
@@ -107,40 +133,21 @@ Future<Map<String, dynamic>> registerDevice({
   return _handleResponse(response);
 }
 
-// ✅ Login User
-Future<Map<String, dynamic>> loginUser({
-  required String phoneNumber,
-  required String password,
-  required String deviceId,
-}) async {
-  final url = Uri.parse('$baseUrl/auth/login');
-
-  final body = {
-    "phone_number": phoneNumber,
-    "password": password,
-    "device_id": deviceId,
-  };
-
-  final response = await http.post(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode(body),
-  );
-
-  return _handleResponse(response);
-}
-
 Map<String, dynamic> _handleResponse(http.Response response) {
+  final decoded = jsonDecode(response.body);
+
   if (response.statusCode >= 200 && response.statusCode < 300) {
-    return jsonDecode(response.body);
+    return decoded;
   } else {
-    final decoded = jsonDecode(response.body);
     final message = decoded['message']?.toLowerCase() ?? '';
 
-    if (message.contains('incorrect') || message.contains('invalid')) {
+    if (response.request != null &&
+        response.request!.url.path.contains('/login') &&
+        (message.contains('incorrect') || message.contains('invalid'))) {
       throw Exception('Incorrect username or password.');
     }
 
+    // Use backend message for all other failures
     throw Exception(decoded['message'] ?? 'An unexpected error occurred.');
   }
 }

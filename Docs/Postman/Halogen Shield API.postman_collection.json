@@ -1,0 +1,3659 @@
+{
+	"info": {
+		"_postman_id": "581a575b-ee9c-4447-aa30-5890e932c3b3",
+		"name": "Halogen Shield API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19494059"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Alerts",
+					"item": [
+						{
+							"name": "List All The Alerts",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/user-alerts",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"user-alerts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Alert By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/user-alerts/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"user-alerts",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Admin Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"var userData = jsonData.data;",
+											"//console.log(jsonData);",
+											"if(userData.hasOwnProperty('token')){",
+											"pm.environment.set(\"AdminAccessToken\", userData.token);",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{AdminUsername}}\",\r\n    \"password\": \"{{AdminPassword}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/admin/auth/login",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Confirm OTP",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"otp\": \"393281\",\r\n    \"phone_number\": \"09072767969\"\r\n    // \"email\": \"solomonabu90@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/confirm-otp",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"confirm-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Init Password Reset",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"solomonabu90@gmail.com\"\r\n    // \"phone_number\": \"09072767969\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/auth/init/reset-password",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"auth",
+										"init",
+										"reset-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"solomon1111\",\r\n    \"confirmation_id\": \"72d52556-c18e-46a9-91cd-b3091a39cf2c\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/auth/reset-password",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"auth",
+										"reset-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Init Pin Reset",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/init/reset-pin",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"init",
+										"reset-pin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Pin",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"pin\": \"1212\",\r\n    \"confirmation_id\": \"7679272a-b7f4-490f-ab6c-7209f19d89e2\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/reset-pin",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"reset-pin"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Dashboard",
+					"item": [
+						{
+							"name": "Get Dashboard Data",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/dashboard",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"dashboard"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Meta",
+					"item": [],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Requests",
+					"item": [],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Security Profiles",
+					"item": [
+						{
+							"name": "Sections",
+							"item": [
+								{
+									"name": "Create Section",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"ref_code\": \"A1A1\",\n    \"base_code\": \"A1\",\n    \"name\": \"Profile Information\",\n    \"info\": {}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/sections",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"sections"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"ref_code\": \"B1\",\n    \"base_code\": \"00\",\n    \"name\": \"Spouse\",\n    \"info\": {}\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/sections",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"sections"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "342"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"156-BV+J40vezonGjZDpl6JnzKNW++c\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 11:40:28 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"success\": true,\n    \"message\": \"Section added successfully\",\n    \"data\": {\n        \"ref_code\": \"B1\",\n        \"base_code\": \"00\",\n        \"name\": \"Spouse\",\n        \"info\": {},\n        \"created_by\": null,\n        \"id\": \"fbaaaf78-fb34-4050-bd68-452a32824396\",\n        \"created_at\": \"2025-04-19T11:40:27.872Z\",\n        \"modified_at\": \"2025-04-19T11:40:27.872Z\",\n        \"modified_by\": null,\n        \"deleted_at\": null,\n        \"deleted_by\": null,\n        \"deleted_flag\": false\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "List All Sections",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/sections?base_code=00",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"sections"
+											],
+											"query": [
+												{
+													"key": "base_code",
+													"value": "00"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/sections?base_code=00",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"sections"
+													],
+													"query": [
+														{
+															"key": "base_code",
+															"value": "00"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "357"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"165-tpbXYhWOMycvyweTicl5vf9fqR0\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 10:37:20 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"success\": true,\n    \"message\": \"Sections listed successfully\",\n    \"data\": [\n        {\n            \"id\": \"09301f9d-ec85-41f9-94af-441dd7efc101\",\n            \"ref_code\": null,\n            \"base_code\": \"00\",\n            \"name\": \"Principal Profile\",\n            \"info\": {},\n            \"created_at\": \"2025-04-19T10:30:30.594Z\",\n            \"created_by\": null,\n            \"modified_at\": \"2025-04-19T10:30:30.594Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false\n        }\n    ]\n}"
+										}
+									]
+								},
+								{
+									"name": "Get Section By ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/sections/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"sections",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "09301f9d-ec85-41f9-94af-441dd7efc101"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Section",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"ref_code\": \"A1\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/sections/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"sections",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "09301f9d-ec85-41f9-94af-441dd7efc101"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"ref_code\": \"B1\",\n    \"base_code\": \"00\",\n    \"name\": \"Spouses\",\n    \"info\": {}\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/sections/:id",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"sections",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "fbaaaf78-fb34-4050-bd68-452a32824396"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "350"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"15e-9e1JUZlECOPPqmWmWIoJsOVSNSo\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 11:49:05 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"status\": \"success\",\n    \"message\": \"Section Updated successfully.\",\n    \"data\": {\n        \"ref_code\": \"B1\",\n        \"base_code\": \"00\",\n        \"name\": \"Spouses\",\n        \"info\": {},\n        \"modified_at\": \"2025-04-19T11:49:05.226Z\",\n        \"id\": \"fbaaaf78-fb34-4050-bd68-452a32824396\",\n        \"created_at\": \"2025-04-19T11:40:27.872Z\",\n        \"created_by\": null,\n        \"modified_by\": null,\n        \"deleted_at\": null,\n        \"deleted_by\": null,\n        \"deleted_flag\": false\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "Delete Section",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/sections/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"sections",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "fbaaaf78-fb34-4050-bd68-452a32824396"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/sections/:id",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"sections",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "fbaaaf78-fb34-4050-bd68-452a32824396"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "62"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"3e-w1YzkEo0pr+WfD+rSwO0+Sas1zM\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 11:50:41 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"status\": \"success\",\n    \"message\": \"Section deleted successfully.\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Questions",
+							"item": [
+								{
+									"name": "Options",
+									"item": [
+										{
+											"name": "Create Option",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"copy_question_id\": null,\n    \"label\": \"Others\",\n    \"score\": 3.5,\n    \"next_question_id\":\"\",\n    // \"multiplier\": 0,\n    \"info\": {}\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions/:qid/options",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions",
+														":qid",
+														"options"
+													],
+													"variable": [
+														{
+															"key": "qid",
+															"value": "fbfc2aa3-a518-4333-be32-55ad7ff7a9a8",
+															"description": "The ID of the question"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "List All Options",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions/:qid/options",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions",
+														":qid",
+														"options"
+													],
+													"variable": [
+														{
+															"key": "qid",
+															"value": "fbfc2aa3-a518-4333-be32-55ad7ff7a9a8"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get Option By ID",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions:/:qid/options/:pid",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions:",
+														":qid",
+														"options",
+														":pid"
+													],
+													"variable": [
+														{
+															"key": "qid",
+															"value": ""
+														},
+														{
+															"key": "pid",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Update Option",
+											"request": {
+												"method": "PATCH",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions:/:qid/options/:pid",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions:",
+														":qid",
+														"options",
+														":pid"
+													],
+													"variable": [
+														{
+															"key": "qid",
+															"value": ""
+														},
+														{
+															"key": "pid",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Delete Option",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions:/:qid/options/:pid",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions:",
+														":qid",
+														"options",
+														":pid"
+													],
+													"variable": [
+														{
+															"key": "qid",
+															"value": ""
+														},
+														{
+															"key": "pid",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Question",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"ref_code\": \"A1Q3\",\n    \"base_code\": \"A1\",\n    \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n    \"factored_question_id\": null,\n    \"parent_question_id\": null,\n    \"next_question_id\": null,\n    \"answer_module\": \"single\", //single, multiple\n    \"question\": \"What is your Marital Status\",\n    \"type\": \"dropdown\", //free-form, dropdown\n    \"source\": \"user\", // user, compute\n    \"compute\": null, // default: average\n    \"info\": {},\n    \"group_label\": \"gender\",\n    \"options_meta_base_code\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/questions",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"questions"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"ref_code\": \"A1Q1\",\n    \"base_code\": \"A1\",\n    \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n    \"factored_question_id\": null,\n    \"parent_question_id\": null,\n    \"question\": \"What is your Full Name\",\n    \"type\": \"free-form\", //free-form, dropdown\n    \"source\": \"user\", // user, compute\n    \"compute\": null, // default: average\n    \"info\": {},\n    \"group_label\": null,\n    \"options_meta_base_code\": null\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "68"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"44-qbeRwTBXWywYOri0BZI0ufNl+Dc\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 12:33:04 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"success\": true,\n    \"message\": \"Question added successfully\",\n    \"data\": null\n}"
+										}
+									]
+								},
+								{
+									"name": "List All Questions",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/questions",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"questions"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "608"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"260-b5m5NctsaDAhk4u6rDDRObv7kuw\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 12:38:29 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"success\": true,\n    \"message\": \"Questions listed successfully\",\n    \"data\": [\n        {\n            \"id\": \"3d5f94b8-e958-4b27-a1ce-4c59bc979e3e\",\n            \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n            \"factored_question_id\": null,\n            \"parent_question_id\": null,\n            \"question\": \"What is your Full Name\",\n            \"type\": \"free-form\",\n            \"base_code\": \"A1\",\n            \"source\": \"user\",\n            \"compute\": null,\n            \"info\": {},\n            \"group_label\": null,\n            \"created_at\": \"2025-04-19T12:33:03.998Z\",\n            \"created_by\": \"b4e86a5b-9e97-41fc-aeaf-3203268585c6\",\n            \"modified_at\": \"2025-04-19T12:33:03.998Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false,\n            \"options_meta_base_code\": null,\n            \"ref_code\": \"A1Q1\"\n        }\n    ]\n}"
+										}
+									]
+								},
+								{
+									"name": "Get Question By ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"questions",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "abbdb14d-3528-45b1-8302-e83d39a76410"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "3d5f94b8-e958-4b27-a1ce-4c59bc979e3e"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "613"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"265-cGsFAuYoPo9SnOojORqN9XFfYDA\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 12:40:51 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"status\": \"success\",\n    \"message\": \"Question retrieved successfully.\",\n    \"data\": {\n        \"id\": \"3d5f94b8-e958-4b27-a1ce-4c59bc979e3e\",\n        \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n        \"factored_question_id\": null,\n        \"parent_question_id\": null,\n        \"question\": \"What is your Full Name\",\n        \"type\": \"free-form\",\n        \"base_code\": \"A1\",\n        \"source\": \"user\",\n        \"compute\": null,\n        \"info\": {},\n        \"group_label\": null,\n        \"created_at\": \"2025-04-19T12:33:03.998Z\",\n        \"created_by\": \"b4e86a5b-9e97-41fc-aeaf-3203268585c6\",\n        \"modified_at\": \"2025-04-19T12:33:03.998Z\",\n        \"modified_by\": null,\n        \"deleted_at\": null,\n        \"deleted_by\": null,\n        \"deleted_flag\": false,\n        \"options_meta_base_code\": null,\n        \"ref_code\": \"A1Q1\"\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "Update Question",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"ref_code\": \"A1Q4\",\n    // \"base_code\": \"A1\",\n    // \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n    \"factored_question_id\": \"fbfc2aa3-a518-4333-be32-55ad7ff7a9a8\",\n    // \"parent_question_id\": null,\n    // \"question\": \"What is your Full Name...\",\n    // \"type\": \"free-form\", //free-form, dropdown\n    // \"source\": \"user\", // user, compute\n    // \"compute\": null, // default: average\n    // \"info\": {},\n    \"group_label\": null\n    // \"options_meta_base_code\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"questions",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "abbdb14d-3528-45b1-8302-e83d39a76410"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"ref_code\": \"A1Q1\",\n    \"base_code\": \"A1\",\n    \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n    \"factored_question_id\": null,\n    \"parent_question_id\": null,\n    \"question\": \"What is your Full Name...\",\n    \"type\": \"free-form\", //free-form, dropdown\n    \"source\": \"user\", // user, compute\n    \"compute\": null, // default: average\n    \"info\": {},\n    \"group_label\": null,\n    \"options_meta_base_code\": null\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "3d5f94b8-e958-4b27-a1ce-4c59bc979e3e"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "627"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"273-UtGukDfLrGWHFmmB3kybKF16uOY\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 13:28:08 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"status\": \"success\",\n    \"message\": \"Question Updated successfully.\",\n    \"data\": {\n        \"question\": {\n            \"base_code\": \"A1\",\n            \"ref_code\": \"A1Q1\",\n            \"section_id\": \"5d15dbe2-2b63-4693-8c27-31b82e716b0c\",\n            \"factored_question_id\": null,\n            \"parent_question_id\": null,\n            \"question\": \"What is your Full Name...\",\n            \"type\": \"free-form\",\n            \"source\": \"user\",\n            \"compute\": null,\n            \"group_label\": null,\n            \"options_meta_base_code\": null,\n            \"info\": {},\n            \"modified_at\": \"2025-04-19T13:28:08.295Z\",\n            \"id\": \"3d5f94b8-e958-4b27-a1ce-4c59bc979e3e\",\n            \"created_at\": \"2025-04-19T12:33:03.998Z\",\n            \"created_by\": \"b4e86a5b-9e97-41fc-aeaf-3203268585c6\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "Delete Question",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"security-profiles",
+												"questions",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "d24c2002-bc05-4c2c-a617-5cb6183d6bb1",
+													"description": "The ID of the question"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Success",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{API_URL}}/admin/security-profiles/questions/:id",
+													"host": [
+														"{{API_URL}}"
+													],
+													"path": [
+														"admin",
+														"security-profiles",
+														"questions",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "3d5f94b8-e958-4b27-a1ce-4c59bc979e3e",
+															"description": "The ID of the question"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "X-Powered-By",
+													"value": "Express"
+												},
+												{
+													"key": "Vary",
+													"value": "Origin"
+												},
+												{
+													"key": "Access-Control-Allow-Credentials",
+													"value": "true"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Content-Length",
+													"value": "63"
+												},
+												{
+													"key": "ETag",
+													"value": "W/\"3f-vBwkbJnjoq4OJrw9mQYUpbaXSVQ\""
+												},
+												{
+													"key": "Date",
+													"value": "Sat, 19 Apr 2025 13:28:24 GMT"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"status\": \"success\",\n    \"message\": \"Question deleted successfully.\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Get Security Profiles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/security-profiles/",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"security-profiles",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Security Profile By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/security-profiles/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"security-profiles",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Security Profile Report",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/security-profiles/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"security-profiles",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Services",
+					"item": [
+						{
+							"name": "Create New Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"ref_code\": \"01PP\",\n    \"base_code\": \"00\",\n    \"additional_code\": \"\",\n    \"name\": \"Personal Protection\",\n    // Amounts Are in Naira & Kobo\n    \"amount\": 200000.00,\n    \"description\": \"This is for personal protection\",\n    \"debit_wallet\": true,\n    \"status\": \"active\" //'active', 'inactive'\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/admin/services",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"services"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"ref_code\": \"01PP\",\n    \"base_code\": \"00\",\n    \"additional_code\": \"\",\n    \"name\": \"Personal Protection\",\n    // Amounts Are in Naira & Kobo\n    \"amount\": 200000.00,\n    \"description\": \"This is for personal protection\",\n    \"debit_wallet\": true,\n    \"status\": \"active\" //'active', 'inactive'\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/services",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"services"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Vary",
+											"value": "Origin"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "526"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"20e-r1QzL3taeekOOnYDyzQUcI6BoKc\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 09 May 2025 21:50:27 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"Service added successfully\",\n    \"data\": {\n        \"service\": {\n            \"ref_code\": \"01PP\",\n            \"base_code\": \"00\",\n            \"additional_code\": \"\",\n            \"name\": \"Personal Protection\",\n            \"amount\": 200000,\n            \"description\": \"This is for personal protection\",\n            \"debit_wallet\": true,\n            \"status\": \"active\",\n            \"created_by\": \"b4e86a5b-9e97-41fc-aeaf-3203268585c6\",\n            \"id\": \"fc277883-8838-45d0-9148-ec083806dc09\",\n            \"meta\": {},\n            \"created_at\": \"2025-05-09T21:50:27.428Z\",\n            \"modified_at\": \"2025-05-09T21:50:27.428Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Service",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"additional_code\": \"\",\n    \"name\": \"Personal Protection (updated)\",\n    // Amounts Are in Naira & Kobo\n    \"amount\": 201000.00,\n    \"description\": \"This is for personal protection (updated)\",\n    \"debit_wallet\": true,\n    \"status\": \"inactive\" //'active', 'inactive'\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/admin/services/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"services",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "fc277883-8838-45d0-9148-ec083806dc09"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All The Services",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/services",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"services"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/services",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"services"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Vary",
+											"value": "Origin"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "518"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"206-SHneml8zIKDAL8fKL2Q7VN96Hg8\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 09 May 2025 21:51:00 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"Services listed successfully\",\n    \"data\": [\n        {\n            \"id\": \"fc277883-8838-45d0-9148-ec083806dc09\",\n            \"ref_code\": \"01PP\",\n            \"base_code\": \"00\",\n            \"additional_code\": \"\",\n            \"name\": \"Personal Protection\",\n            \"amount\": 200000,\n            \"description\": \"This is for personal protection\",\n            \"debit_wallet\": true,\n            \"status\": \"active\",\n            \"meta\": {},\n            \"created_at\": \"2025-05-09T21:50:27.428Z\",\n            \"created_by\": \"b4e86a5b-9e97-41fc-aeaf-3203268585c6\",\n            \"modified_at\": \"2025-05-09T21:50:27.428Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Service By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/services/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"services",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "fc277883-8838-45d0-9148-ec083806dc09"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Service",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/services/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"services",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "fc277883-8838-45d0-9148-ec083806dc09"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Service Requests",
+					"item": [
+						{
+							"name": "List All Service Requests",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/service-requests",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"service-requests"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Service Request By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/service-requests/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"service-requests",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "182a354a-aea3-470d-b3d9-e41e5eadb91a"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Transactions",
+					"item": [],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Properties",
+							"item": [
+								{
+									"name": "Get User Transactions",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/users/:id/transactions",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"users",
+												":id",
+												"transactions"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User Devices",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/users/:id/devices",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"users",
+												":id",
+												"devices"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User Service Requests",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/admin/users/:id/requests",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"users",
+												":id",
+												"requests"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Send Push To User",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"\",\n    \"message\": \"\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/admin/users/:id/push",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"admin",
+												"users",
+												":id",
+												"push"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "List All The Users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/users",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/users/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3aa0df25-73a3-44be-9e0e-e9fe29ddba7d"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{AdminAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Mobile",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Reset Password",
+							"item": [
+								{
+									"name": "Init Password Reset",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    // \"email\": \"solomonabu90@gmail.com\"\r\n    \"phone_number\": \"{{PhoneNumber}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/auth/init/reset-password",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"auth",
+												"init",
+												"reset-password"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reset Password",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"password\": \"123456\",\r\n    \"confirmation_id\": \"{{ConfirmationID}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/auth/reset-password",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"auth",
+												"reset-password"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    var userData = jsonData.data;",
+											"    //console.log(jsonData);",
+											"    if (userData.hasOwnProperty('token')) {",
+											"        pm.environment.set(\"UserAccessToken\", userData.token);",
+											"    }",
+											"",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/login",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    var userData = jsonData.data;",
+											"    //console.log(jsonData);",
+											"    if (userData.hasOwnProperty('token')) {",
+											"        pm.environment.set(\"UserAccessToken\", userData.token);",
+											"    }",
+											"",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/logout",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"full_name\": \"{{UserFullName}}\",\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"email\": \"{{UserEmail}}\"\r\n    // \"password\": \"{{Password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/register",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Confirm OTP",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"otp\": \"123456\",\r\n    \"phone_number\": \"{{PhoneNumber}}\"\r\n    // \"email\": \"{{UserEmail}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/confirm-otp",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"confirm-otp"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Successful",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"otp\": \"123456\",\r\n    \"phone_number\": \"{{PhoneNumber}}\"\r\n    // \"email\": \"{{UserEmail}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/auth/confirm-otp",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"auth",
+												"confirm-otp"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Vary",
+											"value": "Origin"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "108"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"6c-UuWWBgzJWmsbOIERKUCPN5y4vyI\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 15 Apr 2025 09:09:28 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"OTP confirmed\",\n    \"data\": {\n        \"confirmation_id\": \"ee07b937-9229-4c65-94c7-af7bd32a9c94\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Create Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"confirmation_id\":\"{{ConfirmationID}}\",\r\n    \"password\": \"{{Password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/auth/create-password",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"auth",
+										"create-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Init Pin Reset",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/auth/init/reset-pin",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"auth",
+										"init",
+										"reset-pin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Pin",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"pin\": \"1111\",\r\n    \"confirmation_id\": \"ae7c47e4-0034-4a08-ae01-ca8ea22498f5\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/auth/reset-pin",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"auth",
+										"reset-pin"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Meta",
+					"item": [
+						{
+							"name": "Fetch Definitions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/meta/codes?base_code=00",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"meta",
+										"codes"
+									],
+									"query": [
+										{
+											"key": "code_description",
+											"value": "banks",
+											"disabled": true
+										},
+										{
+											"key": "base_code",
+											"value": "00"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch Definitions Link",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/meta/codes/link",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"meta",
+										"codes",
+										"link"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Security Profile",
+					"item": [
+						{
+							"name": "Create Security Profile",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/security-profile",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Security Profile Created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/security-profile",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"security-profile"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Vary",
+											"value": "Origin"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "397"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"18d-+e/7dTFIKY+3uW+6bhwwDC57MDA\""
+										},
+										{
+											"key": "Date",
+											"value": "Sun, 27 Apr 2025 07:06:13 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"security profile created successfully\",\n    \"data\": {\n        \"profile\": {\n            \"user_id\": \"3aa0df25-73a3-44be-9e0e-e9fe29ddba7d\",\n            \"score\": \"0.00\",\n            \"code\": \"rU6kMsr\",\n            \"info\": {},\n            \"id\": \"e53b3a85-4ac7-442b-9826-3e35a97d2edd\",\n            \"created_at\": \"2025-04-27T07:06:13.192Z\",\n            \"created_by\": null,\n            \"modified_at\": \"2025-04-27T07:06:13.192Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Fetch User Security Profile",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/security-profile",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Security Profile Returned",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{API_URL}}/security-profile",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"security-profile"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Vary",
+											"value": "Origin"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "397"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"18d-ywG4fo9rChDVYLGQqvn+rjyFo+I\""
+										},
+										{
+											"key": "Date",
+											"value": "Sun, 27 Apr 2025 07:07:50 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"security profile created successfully\",\n    \"data\": {\n        \"profile\": {\n            \"id\": \"e53b3a85-4ac7-442b-9826-3e35a97d2edd\",\n            \"user_id\": \"3aa0df25-73a3-44be-9e0e-e9fe29ddba7d\",\n            \"code\": \"rU6kMsr\",\n            \"score\": \"0.00\",\n            \"created_at\": \"2025-04-27T07:06:13.192Z\",\n            \"created_by\": null,\n            \"modified_at\": \"2025-04-27T07:06:13.192Z\",\n            \"modified_by\": null,\n            \"deleted_at\": null,\n            \"deleted_by\": null,\n            \"deleted_flag\": false,\n            \"info\": {}\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Fetch Questions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/security-profile/questions",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile",
+										"questions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Answers",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"answers\": [\n        {\n            \"question_id\": \"fbfc2aa3-a518-4333-be32-55ad7ff7a9a8\",\n            \"option_id\": \"24be0aaa-3f81-49b5-9cae-73f2c59298ec\",\n            \"value\": \"Married (Ish)\",\n            \"label\":\"First Name\",\n            \"info\": {}\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/security-profile/answers",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile",
+										"answers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Answers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/security-profile/answers",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile",
+										"answers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Report",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/security-profile/report",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"security-profile",
+										"report"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "User Device",
+					"item": [
+						{
+							"name": "Register Device",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"device_token\":\"Testtest\",\n    \"device_type\":\"web\",\n    \"device_data\":{\n        \"Platform\":\"test\"\n    },\n    \"app_data\":{\n        \"Version\":10.1\n    }\n}\n\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/device",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"device"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Device",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{UserAccessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"device_data\":{\n        \"Platform\":\"test\"\n    },\n    \"app_data\":{\n        \"Version\":10.1\n    },\n    \"push_data\":{\n        \"push\":{\n            \"token\":\"-------\"\n        }\n    }\n}\n\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/device",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"device"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send push to user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\":\"e5d064fc-ce43-41b9-aa5e-376bdcc5366f\",\n    \"title\":\"Please confirm\",\n    \"message\":\"If you can get this, you can make a tranfer now \"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dev}}/device/test_push",
+									"host": [
+										"{{dev}}"
+									],
+									"path": [
+										"device",
+										"test_push"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Wallet",
+					"item": [
+						{
+							"name": "Fund Wallet",
+							"item": [
+								{
+									"name": "Initialize Funding",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}"
+										},
+										"url": {
+											"raw": "{{API_URL}}/wallet/init-fund",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"wallet",
+												"init-fund"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Funding",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}"
+										},
+										"url": {
+											"raw": "{{API_URL}}/wallet/verify-fund",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"wallet",
+												"verify-fund"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Create  Wallet",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{API_URL}}/wallet",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"wallet"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Wallet",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{API_URL}}/wallet",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"wallet"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch Wallet Transactions",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{API_URL}}/wallet/transactions",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"wallet",
+										"transactions"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Services",
+					"item": [
+						{
+							"name": "Requests",
+							"item": [
+								{
+									"name": "Make A Request",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pin\": \"0000\",\n    \"info\": {\n        \"questions\": [\n            {\n                \"question\": \"How many cars do you need\",\n                \"answer\": 4\n            }\n        ]\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{API_URL}}/services/:id/requests",
+											"host": [
+												"{{API_URL}}"
+											],
+											"path": [
+												"services",
+												":id",
+												"requests"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "fc277883-8838-45d0-9148-ec083806dc09"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "List Services",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/services",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"services"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Service Requests",
+					"item": [
+						{
+							"name": "List all User's Requests",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"phone_number\": \"{{PhoneNumber}}\",\r\n    \"password\": \"{{Password}}\",\r\n    \"device_id\":\"{{UserDeviceID}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{API_URL}}/service-requests",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"service-requests"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Make A Request With Ref Code",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"0000\",\n    //ref_code of the service with the request\n    \"ref_code\": \"\",\n    \"info\": {\n        \"questions\": [\n            {\n                \"question\": \"How many cars do you need\",\n                \"answer\": 4\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/services/requests",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"services",
+										"requests"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Profile",
+					"item": [
+						{
+							"name": "Get Profile",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/profile",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"old_password\":\"\",\n    \"password\":\"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/profile/change-password",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"profile",
+										"change-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "⚠️ Delete User Account",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\":\"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/profile/delete-account",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"profile",
+										"delete-account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Profile Picture",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "The file to be uploaded",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{API_URL}}/profile/upload/image",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"profile",
+										"upload",
+										"image"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "SOS",
+					"item": [
+						{
+							"name": "Send SOS",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"type\": \"\", \n    \"message\": \"\",\n    \"info\": {\n        // Info like location can be pasded, etc\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_URL}}/sos",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"sos"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{UserAccessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "APIs",
+			"item": [
+				{
+					"name": "Termii",
+					"item": [
+						{
+							"name": "Send SMS",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "/* {\n    \"to\": \"2349060237734\",\n    \"from\": \"Halogen\",\n    \"sms\": \"Dear customer, this is a test message to confirm if you receive SMS from us. Thanks for your patronage\",\n    \"type\": \"plain\",\n    \"channel\": \"generic\",\n    \"api_key\": \"{{TERII_API_KEY}}\"\n} */\n\n/* {\n    \"api_key\": \"{{TERII_API_KEY}}\",\n    \"to\": \"2349023333682\",\n    \"from\": \"Browsepay\",\n    \"sms\": \"DO NOT DISCLOSE. Use 455468 as your One Time Passcode. Expires on 23-Aug-2024 11:27 AM. Please contact support if you did not request this change.\",\n    \"type\": \"plain\",\n    \"channel\": \"generic\"\n} */\n\n{\n    \"api_key\": \"{{TERII_API_KEY}}\",\n    \"to\": \"2348128195721\",\n    \"from\": \"N-Alert\",\n    \"sms\": \"DO NOT DISCLOSE. Use XXXX as your One Time Passcode. Expires on 27-Aug-2024 11:10 AM. Please contact support if you did not request this change.\",\n    \"type\": \"plain\",\n    \"channel\": \"dnd\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{TERMII_URL}}/sms/send/",
+									"host": [
+										"{{TERMII_URL}}"
+									],
+									"path": [
+										"sms",
+										"send",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST_URL}}/health",
+					"host": [
+						"{{HOST_URL}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

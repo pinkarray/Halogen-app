@@ -61,6 +61,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SecurityProfileProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        
       ],
       child: const HalogenApp(),
     ),

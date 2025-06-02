@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../services/auth_service.dart';
 import '../../../providers/user_form_data_provider.dart';
+import 'package:halogen/shared/helpers/session_manager.dart';
 import 'final_account_created_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -55,7 +56,10 @@ class _AccountCreationScreenState extends State<AccountCreationScreen>
 
       if (!mounted) return;
 
-      provider.markFullyRegistered();
+      // ✅ Save user to session
+      final userModel = provider.toUserModel();
+      await SessionManager.saveUserModel(userModel);
+      await SessionManager.saveUserProfile(userModel.toJson()); // optional
 
       _startCountdown();
     } catch (e) {
@@ -63,7 +67,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Account creation failed: $e')),
       );
-      Navigator.pop(context); 
+      Navigator.pop(context);
     }
   }
 
@@ -109,14 +113,17 @@ class _AccountCreationScreenState extends State<AccountCreationScreen>
                         width: 80,
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    const Text(
-                      "Hang tight. We're setting things up!",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Objective',
-                        color: Color(0xFF1C2B66),
+                    const SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        "Hang tight. We're setting things up!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Objective',
+                          color: Color(0xFF1C2B66),
+                        ),
                       ),
                     ),
                     Text(
