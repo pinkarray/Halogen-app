@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:provider/provider.dart';
 import 'providers/user_form_data_provider.dart';
 import 'screens/splash_screen.dart';
@@ -33,6 +34,15 @@ import 'security_profile/providers/security_profile_provider.dart';
 import 'modules/settings/provider/settings_provider.dart';
 import 'providers/theme_provider.dart';
 
+import 'services/quick_actions_service.dart';
+
+// Import the ProfilePage and SettingsPage
+import 'modules/profile/profile_page.dart';
+import 'modules/settings/settings_page.dart';
+
+// Create a global navigator key to use in our app
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -57,13 +67,28 @@ Future<void> main() async {
   );
 }
 
-class HalogenApp extends StatelessWidget {
+class HalogenApp extends StatefulWidget {
   const HalogenApp({super.key});
+
+  @override
+  State<HalogenApp> createState() => _HalogenAppState();
+}
+
+class _HalogenAppState extends State<HalogenApp> {
+  late QuickActionsService _quickActionsService;
+  
+  @override
+  void initState() {
+    super.initState();
+    _quickActionsService = QuickActionsService(navigatorKey: navigatorKey);
+    _quickActionsService.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     return MaterialApp(
+      navigatorKey: navigatorKey, // Add the navigator key
       title: "Halogen",
       debugShowCheckedModeBanner: false,
       themeMode: themeProvider.themeMode,
@@ -194,6 +219,9 @@ class HalogenApp extends StatelessWidget {
             (context) => const ConfirmationScreen(),
         ...settingsRoutes,
         '/settings': (context) => const SettingsScreen(),
+        // Add routes for quick actions
+        '/profile': (context) => ProfilePage(),
+        '/sos': (context) => SettingsPage(),
       },
     );
   }

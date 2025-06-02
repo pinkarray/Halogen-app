@@ -18,6 +18,7 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   String? selectedMethod;
   bool isLoading = false;
+  bool paymentCancelled = false;
 
   void _showBankTransferBottomSheet(BuildContext context, int amount) {
     showModalBottomSheet(
@@ -27,7 +28,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 28,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 28,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -71,14 +77,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 24),
-            GlowingArrowsButton(
-              text: "I've sent the money",
-              onPressed: () {
-                final provider = context.read<SecuredMobilityProvider>();
-                provider.markStageComplete(5);
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed('/secured-mobility/payment-success');
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                GlowingArrowsButton(
+                  text: "I've sent the money",
+                  onPressed: () {
+                    final provider = context.read<SecuredMobilityProvider>();
+                    provider.markStageComplete(5);
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed('/secured-mobility/payment-success');
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -89,6 +106,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void _processPaystackPayment(int amount, {bool isTransfer = false}) async {
     setState(() {
       isLoading = true;
+      paymentCancelled = false;
     });
 
     try {
@@ -115,10 +133,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
           Navigator.of(context).pushNamed('/secured-mobility/payment-success');
         },
         transactionNotCompleted: (String reason) {
-          // Payment failed
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Payment was not completed: $reason')),
-          );
+          // Payment failed or was cancelled
+          setState(() {
+            paymentCancelled = true;
+          });
+          
+          if (reason.toLowerCase().contains('cancel') || reason.toLowerCase().contains('aborted')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Payment cancelled')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Payment was not completed: $reason')),
+            );
+          }
         },
       );
 
@@ -138,10 +166,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return formatter.format(amount);
   }
 
+  void _returnToServicePage() {
+    Navigator.of(context).popUntil(
+      (route) => route.settings.name == '/secured-mobility' || route.isFirst
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SecuredMobilityProvider>();
     final totalCost = provider.totalCost;
+    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
@@ -155,16 +190,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: const [
-                    HalogenBackButton(),
-                    SizedBox(width: 12),
-                    Text(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    HalogenBackButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
                       'Payment',
                       style: TextStyle(
                         fontSize: 20,
@@ -172,76 +210,108 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         fontFamily: 'Objective',
                       ),
                     ),
+                    const Spacer(),
+                    if (paymentCancelled)
+                      TextButton(
+                        onPressed: _returnToServicePage,
+                        child: const Text('Return to Services'),
+                      ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1C2B66),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        'Available Balance',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontFamily: 'Objective',
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: screenSize.height - 150, // Adjust for app bar height
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1C2B66),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Text(
+                                'Available Balance',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontFamily: 'Objective',
+                                ),
+                              ),
+                              Text(
+                                'NGN500,000',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Objective',
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Text(
-                        'NGN500,000',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Objective',
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Payment Method',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            fontFamily: 'Objective',
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        _paymentOption('Wallet'),
+                        _paymentOption('Bank Transfer'),
+                        _paymentOption('Card Payment'),
+                        const SizedBox(height: 32),
+                        Center(
+                          child: isLoading
+                              ? const CircularProgressIndicator()
+                              : Column(
+                                  children: [
+                                    GlowingArrowsButton(
+                                      text: 'Pay ${formatCurrency(totalCost)}',
+                                      onPressed: () {
+                                        if (selectedMethod == 'Bank Transfer') {
+                                          _processPaystackPayment(totalCost, isTransfer: true);
+                                        } else if (selectedMethod == 'Wallet') {
+                                          provider.markStageComplete(5);
+                                          Navigator.of(context).pushNamed('/secured-mobility/payment-success');
+                                        } else if (selectedMethod == 'Card Payment') {
+                                          _processPaystackPayment(totalCost);
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Please select a payment method')),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    if (paymentCancelled) ...[
+                                      const SizedBox(height: 16),
+                                      TextButton(
+                                        onPressed: _returnToServicePage,
+                                        child: const Text('Cancel and Return to Services'),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Payment Method',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    fontFamily: 'Objective',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _paymentOption('Wallet'),
-                _paymentOption('Bank Transfer'),
-                _paymentOption('Card Payment'),
-                const SizedBox(height: 32),
-                Center(
-                  child: isLoading
-                      ? const CircularProgressIndicator()
-                      : GlowingArrowsButton(
-                          text: 'Pay ${formatCurrency(totalCost)}',
-                          onPressed: () {
-                            if (selectedMethod == 'Bank Transfer') {
-                              _processPaystackPayment(totalCost, isTransfer: true);
-                            } else if (selectedMethod == 'Wallet') {
-                              provider.markStageComplete(5);
-                              Navigator.of(context).pushNamed('/secured-mobility/payment-success');
-                            } else if (selectedMethod == 'Card Payment') {
-                              _processPaystackPayment(totalCost);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please select a payment method')),
-                              );
-                            }
-                          },
-                        ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
