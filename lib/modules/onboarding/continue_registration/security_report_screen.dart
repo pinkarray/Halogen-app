@@ -5,6 +5,7 @@ import '../../../security_profile/providers/security_profile_provider.dart';
 import '../../../shared/widgets/custom_progress_bar.dart';
 import '../../../providers/user_form_data_provider.dart';
 import '../../../shared/helpers/session_manager.dart';
+import '../../../shared/widgets/home_wrapper.dart';
 
 
 class SecurityReportScreen extends StatefulWidget {
@@ -32,6 +33,8 @@ class _SecurityReportScreenState extends State<SecurityReportScreen> {
 
     // ✅ Mark user as fully registered
     userProvider.markFullyRegistered();
+    userProvider.setOnboardingStage(3);
+    await SessionManager.saveStage(3);
 
     // ✅ Save user model to session
     final userModel = userProvider.toUserModel();
@@ -207,6 +210,37 @@ class _SecurityReportScreenState extends State<SecurityReportScreen> {
                       },
                     ),
                   ),
+                  const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomeWrapper(initialIndex: 0)),
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1C2B66),
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Continue to Dashboard",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Objective',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
                 ],
               ),
             ),

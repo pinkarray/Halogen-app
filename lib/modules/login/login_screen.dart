@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../shared/widgets/glowing_arrows_button.dart';
+import '../../providers/user_form_data_provider.dart';
 import 'login_provider.dart';
 import '../../shared/widgets/underlined_glow_input_field.dart';
 import '../../shared/widgets/underlined_glow_password_field.dart';
@@ -90,6 +91,8 @@ class LoginScreenState extends State<LoginScreen> {
         await SessionManager.saveAuthToken(result.token!);
         await SessionManager.saveDeviceId(result.deviceId!);
         await SessionManager.saveUserModel(cleanedUser);
+
+        await context.read<UserFormDataProvider>().hydrateFromSession();
 
         Navigator.pushReplacement(
           context,

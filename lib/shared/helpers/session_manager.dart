@@ -74,4 +74,14 @@ class SessionManager {
     return prefs.getString('password');
   }
 
+  static Future<void> saveStage(int stage) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('onboarding_stage', stage);
+  }
+
+  static Future<int> getStage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('onboarding_stage') ?? 0;
+  }
+
 }

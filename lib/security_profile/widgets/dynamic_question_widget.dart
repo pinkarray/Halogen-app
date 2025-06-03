@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/question_model.dart';
+import '../../providers/user_form_data_provider.dart';
 import '../providers/security_profile_provider.dart';
 import '../../shared/widgets/custom_dropdown_field.dart';
 import '../../shared/widgets/custom_text_field.dart';
@@ -9,11 +10,13 @@ class DynamicQuestionWidget extends StatefulWidget {
   final QuestionModel question;
   final int? instanceIndex;
   final void Function()? onCompleted;
+  final String? sectionCode;
 
   const DynamicQuestionWidget({
     super.key,
     required this.question,
     this.instanceIndex,
+    this.sectionCode,
     this.onCompleted,
   });
 
@@ -218,7 +221,7 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
     final answers = provider.answers;
 
     final baseCode = widget.question.baseCode;
-    if (baseCode.isEmpty) return true;
+    if (baseCode.isEmpty || baseCode == 'SP-PP-CC-NN') return true;
 
     final parent = allQuestions.firstWhere(
       (q) => q.refCode == baseCode,
@@ -226,14 +229,12 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
     );
     if (parent.id.isEmpty) return true;
 
-    final parentKey = widget.instanceIndex != null
-        ? '${parent.id}-${widget.instanceIndex}'
-        : parent.id;
+    final parentKey = parent.refCode.contains('SP-DS') ? parent.id :
+      (widget.instanceIndex != null ? '${parent.id}-${widget.instanceIndex}' : parent.id);
 
     final parentAnswer = answers[parentKey]?.toString().toLowerCase();
     print('[PARENT CHECK] ${widget.question.refCode} → baseCode: $baseCode → parentAnswer: $parentAnswer');
 
-    // Apply special boarding logic ONLY for child questions
     final isChildSchoolQuestion = widget.question.refCode.startsWith('SP-PP-CC-NN-SI') ||
         widget.question.refCode.startsWith('SP-PP-CC-NN-SI-');
 
@@ -256,32 +257,54 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
     return parentAnswer != null && parentAnswer.isNotEmpty && parentAnswer != 'no';
   }
 
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SecurityProfileProvider>();
 
     final shouldShow = _shouldRender(context);
-    print('[DEBUG] Rendering ${widget.question.refCode}, visible: $shouldShow');
 
     if (!shouldShow) {
       return const SizedBox.shrink();
     }
 
-    final icon = _getIconForQuestion(widget.question.refCode);
+        final icon = _getIconForQuestion(widget.question.refCode);
     final isDropdown = widget.question.type == 'dropdown';
     final dropdownLabels = widget.question.options.map((e) => e.label).toList();
 
-    final isSpouseQuestion = widget.question.refCode.startsWith('SP-SS-') ||
-                         widget.question.refCode.startsWith('SP-OCS') ||
-                         widget.question.refCode.startsWith('SP-SOS') ||
-                         widget.question.refCode.startsWith('SP-OTH-S');
+    final ref = widget.question.refCode;
+    final index = widget.instanceIndex;
 
-    final labelSuffix = widget.instanceIndex != null &&
-            !widget.question.refCode.contains('SP-DS-NG') // exclude gatemen
-        ? ' (Child ${widget.instanceIndex! + 1})'
-        : isSpouseQuestion ? ' (Spouse)' : '';
+    final isSpouseQuestion = ref.startsWith('SP-SS-') ||
+        ref.startsWith('SP-OCS') ||
+        ref.startsWith('SP-SOS') ||
+        ref.startsWith('SP-OTH-S');
 
+    final isChildQuestion = ref.startsWith('SP-PP-CC-NN');
+    final isNanny = ref.startsWith('SP-DS-NN');
+    final isCook = ref.startsWith('SP-DS-CS');
+    final isDriver = ref.startsWith('SP-DS-ND');
+
+    String labelSuffix = '';
+    if (index != null) {
+      if (isChildQuestion) {
+        labelSuffix = ' (Child ${index + 1})';
+      } else if (isNanny) {
+        labelSuffix = ' (Nanny ${index + 1})';
+      } else if (isCook) {
+        labelSuffix = ' (Cook ${index + 1})';
+      } else if (isDriver) {
+        labelSuffix = ' (Driver ${index + 1})';
+      }
+    }
+
+    if (isSpouseQuestion) {
+      labelSuffix = ' (Spouse)';
+    }
+
+    final savedAnswer = provider.answers[getAnswerKey()];
+    if (savedAnswer != null && controller.text.isEmpty) {
+      controller.text = savedAnswer.toString();
+    }
 
     if (isDropdown) {
       return CustomDropdownField(
@@ -294,9 +317,14 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
             controller.text = val;
             provider.saveAnswer(getAnswerKey(), val);
             widget.onCompleted?.call();
-          }
-          print('[DROPDOWN] Saved ${getAnswerKey()} = $val');
 
+            if (widget.sectionCode != null) {
+              final formProvider = context.read<UserFormDataProvider>();
+              Future.microtask(() {
+                formProvider.recheckAndUpdateSection(context, widget.sectionCode!);
+              });
+            }
+          }
 
           if (widget.question.refCode == 'SP-PP-MS') {
             provider.showSpouseProfile = val == 'Married';
@@ -311,12 +339,14 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
       controller: controller,
       onChanged: (val) {
         controller.text = val;
-        provider.saveAnswer(getAnswerKey(), val);
-        print('[INPUT] Saved ${getAnswerKey()} = $val');
+        final key = getAnswerKey();
+        provider.saveAnswer(key, val);
+        print('[INPUT] Saved $key = $val');
+
         Future.microtask(() {
           widget.onCompleted?.call();
         });
-      },
+      }
     );
   }
 }

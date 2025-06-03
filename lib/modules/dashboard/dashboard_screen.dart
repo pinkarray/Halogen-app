@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
-import '../../providers/user_form_data_provider.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/dashboard_search_bar.dart';
 import 'widgets/continue_registration_prompt.dart';
@@ -17,6 +15,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   UserModel? _user;
+  bool _isRegistered = false;
 
   @override
   void initState() {
@@ -26,17 +25,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadUser() async {
     final user = await SessionManager.getUserModel();
+    final stage = await SessionManager.getStage();
+
     if (!mounted) return;
     setState(() {
       _user = user;
+      _isRegistered = stage >= 3;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isRegistered = context.watch<UserFormDataProvider>().isFullyRegistered;
-
-        return Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
@@ -56,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   .slideX(begin: -0.3),
               const SizedBox(height: 20),
 
-              if (isRegistered) ...[
+              if (_isRegistered) ...[
                 const Text(
                   "Services",
                   style: TextStyle(
@@ -73,7 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               Expanded(
                 child: Center(
-                  child: isRegistered
+                  child: _isRegistered
                       ? const Text(
                           "Services will appear here once available.",
                           style: TextStyle(

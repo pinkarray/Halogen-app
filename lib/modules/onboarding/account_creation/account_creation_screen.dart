@@ -56,10 +56,12 @@ class _AccountCreationScreenState extends State<AccountCreationScreen>
 
       if (!mounted) return;
 
-      // ✅ Save user to session
       final userModel = provider.toUserModel();
       await SessionManager.saveUserModel(userModel);
-      await SessionManager.saveUserProfile(userModel.toJson()); // optional
+      await SessionManager.saveUserProfile(userModel.toJson());
+
+      provider.setOnboardingStage(1);
+      await SessionManager.saveStage(1);
 
       _startCountdown();
     } catch (e) {

@@ -42,30 +42,35 @@ class _GreetingHeaderState extends State<GreetingHeader> {
         : "${getTimeBasedGreeting()}, $firstName";
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              greeting,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Objective',
-                color: Color(0xFF1C2B66), // ✅ Brand blue
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                greeting,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Objective',
+                  color: Color(0xFF1C2B66),
+                ),
               ),
-            ),
-            const Text(
-              "Your security is in check",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.blueGrey,
-                fontFamily: 'Objective',
+              const Text(
+                "Your security is in check",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.blueGrey,
+                  fontFamily: 'Objective',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         Row(
           children: [
             const CircleAvatar(
@@ -75,7 +80,7 @@ class _GreetingHeaderState extends State<GreetingHeader> {
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/notifications'); // ✅ Navigation
+                Navigator.pushNamed(context, '/notifications');
               },
               child: Stack(
                 alignment: Alignment.topRight,
@@ -92,7 +97,7 @@ class _GreetingHeaderState extends State<GreetingHeader> {
               ),
             ),
           ],
-        ),
+        )
       ],
     );
   }
