@@ -111,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _sectionTitle("Account"),
                 _settingsGroup([
                   _buildSettingTile(Icons.person_outline, "My Profile", () {
-                    Navigator.pushNamed(context, '/profile');
+                    Navigator.pushNamed(context, '/ProfileScreen');
                   }),
                   _buildSettingTile(Icons.account_balance_wallet_outlined, "Wallet", () {
                     Navigator.push(
