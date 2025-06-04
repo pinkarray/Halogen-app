@@ -140,18 +140,12 @@ class PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                 try {
                                   final raw = _phoneController.text.trim();
 
-                                  print('📨 Sending to /auth/register →');
-                                  print('Full name: ${provider.firstName} ${provider.lastName}');
-                                  print('Phone: $raw'); // the actual value you're about to send
-                                  print('Email: ${provider.email}');
-
                                   final result = await registerUser(
                                     fullName: "${provider.firstName} ${provider.lastName}",
                                     phoneNumber: raw, // use raw input here
                                     email: provider.email ?? "",
                                   );
 
-                                  print('📬 Register response: $result');
 
                                   provider.updatePhone(raw); // update it after confirming it's the final value
 

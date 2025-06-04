@@ -299,17 +299,13 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen>
                                       otp: otpCode,
                                     );
 
-                                    print("✅ OTP confirmed. Response: $response");
-
                                     if (!mounted) return;
 
                                     final data = response['data'];
                                       if (data != null && data.containsKey('confirmation_id')) {
                                         provider.markOtpVerified();
                                         provider.saveConfirmationId(data['confirmation_id']);
-                                        print("✅ confirmation_id saved: ${data['confirmation_id']}");
                                       } else {
-                                        print("❌ confirmation_id missing in response data!");
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text('Something went wrong. Please try again.')),
                                         );

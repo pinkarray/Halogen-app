@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:halogen/security_profile/providers/security_profile_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/user_form_data_provider.dart';
-import '../../../security_profile/providers/security_profile_provider.dart';
-import '../../../security_profile/providers/security_profile_provider.dart' as profileProvider;
+
 import '../../../shared/widgets/custom_progress_bar.dart';
 import '../../../shared/helpers/session_manager.dart';
 import '../../../security_profile/widgets/dynamic_question_widget.dart';
@@ -253,11 +252,9 @@ class _ContinueRegistrationScreenState
       final st = provider.answers[stQuestion.id]?.toString().trim() ?? '';
 
       final isValid = sn1.isNotEmpty && st.isNotEmpty;
-      print('[HOME ADDRESS] sn1=$sn1, st=$st, isValid=$isValid');
 
       if (isValid) {
         formProvider.updateSection('B', {'streetName': sn1, 'state': st});
-        print('[HOME ADDRESS] ✅ Section B marked complete');
       }
     });
 
