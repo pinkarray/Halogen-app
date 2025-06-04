@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quick_actions/quick_actions.dart';
 import 'package:provider/provider.dart';
 import 'providers/user_form_data_provider.dart';
 import 'screens/splash_screen.dart';
@@ -33,6 +32,7 @@ import 'modules/settings/profile/provider/profile_provider.dart';
 import 'security_profile/providers/security_profile_provider.dart';
 import 'modules/settings/provider/settings_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/service_provider.dart';
 
 import 'services/quick_actions_service.dart';
 
@@ -61,6 +61,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SecurityProfileProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => ServiceProvider()),
         
       ],
       child: const HalogenApp(),
@@ -221,7 +222,7 @@ class _HalogenAppState extends State<HalogenApp> {
         ...settingsRoutes,
         '/settings': (context) => const SettingsScreen(),
         // Add routes for quick actions
-        '/profile': (context) => ProfilePage(),
+        '/profile-page': (context) => ProfilePage(),
         '/sos': (context) => SettingsPage(),
       },
     );

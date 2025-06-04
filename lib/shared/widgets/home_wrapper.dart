@@ -26,8 +26,6 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
 
   late final List<AnimationController> _controllers;
   late final List<Animation<double>> _scaleAnimations;
-  late final AnimationController _fabAnimationController;
-  late final Animation<double> _fabRotationAnimation;
 
   @override
   void initState() {
@@ -44,7 +42,7 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
     );
 
     _scaleAnimations = _controllers.map((controller) {
-      return Tween<double>(begin: 1.0, end: 1.2).animate(
+      return Tween<double>(begin: 1.0, end: 1.15).animate(
         CurvedAnimation(
           parent: controller,
           curve: Curves.easeOutBack,
@@ -52,17 +50,13 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
       );
     }).toList();
 
-    // Start with the initial animation
     _controllers[_selectedIndex].forward();
   }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
 
-    // Reset previous animation
     _controllers[_selectedIndex].reverse();
-    
-    // Start new animation
     _controllers[index].forward();
 
     setState(() => _selectedIndex = index);
@@ -79,7 +73,7 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Important for transparent bottom nav bar
+      extendBody: true,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
@@ -92,9 +86,7 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
     return Container(
       height: 80,
       margin: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-      ),
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -102,24 +94,22 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 15,
-                spreadRadius: 1,
-                offset: const Offset(0, 5),
+                offset: Offset(0, 5),
               ),
             ],
           ),
-          margin: const EdgeInsets.symmetric(horizontal: 0),
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildIcon(0, LucideIcons.home, "Home"),
-              _buildIcon(1, LucideIcons.shield, "Services"),
-              _buildIcon(2, LucideIcons.monitor, "Monitoring"),
-              _buildIcon(3, LucideIcons.settings, "Settings"),
+              _buildNavItem(0, LucideIcons.layoutGrid, "Home"),
+              _buildNavItem(1, LucideIcons.shield, "Services"),
+              _buildNavItem(2, LucideIcons.monitor, "Monitor"),
+              _buildNavItem(3, LucideIcons.settings, "Settings"),
             ],
           ),
         ),
@@ -127,35 +117,9 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
     );
   }
 
-  Widget _buildIcon(int index, IconData iconData, String label) {
-    final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => _onItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            iconData,
-            size: 28,
-            color: isSelected ? const Color.fromARGB(255, 255, 214, 102) : Colors.black,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color.fromARGB(255, 255, 214, 102) : Colors.black,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
   Widget _buildNavItem(int index, IconData iconData, String label) {
     final isSelected = _selectedIndex == index;
-    
+
     return Flexible(
       child: GestureDetector(
         onTap: () => _onItemTapped(index),
@@ -173,19 +137,10 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
                     child: child,
                   );
                 },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: isSelected
-                      ? BoxDecoration(
-                          color: const Color(0xFFFFCC29).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15),
-                        )
-                      : null,
-                  child: Icon(
-                    iconData,
-                    color: isSelected ? const Color(0xFFFFCC29) : const Color(0xFF1C2B66),
-                    size: 24,
-                  ),
+                child: Icon(
+                  iconData,
+                  color: isSelected ? const Color(0xFFFFCC29) : const Color(0xFF1C2B66),
+                  size: 24,
                 ),
               ),
               const SizedBox(height: 4),

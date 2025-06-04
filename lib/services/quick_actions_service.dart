@@ -28,7 +28,7 @@ class QuickActionsService {
 
   void _handleQuickAction(String shortcutType) {
     if (shortcutType == 'emergency_contacts') {
-      navigatorKey.currentState?.pushNamed('/profile');
+      navigatorKey.currentState?.pushNamed('/profile-page');
     } else if (shortcutType == 'sos') {
       navigatorKey.currentState?.pushNamed('/sos');
     }

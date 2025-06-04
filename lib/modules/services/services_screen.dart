@@ -87,6 +87,110 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
+  void _showRegisterServiceModal(String serviceName, String iconFile) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFF4F4F4),
+                ),
+                child: Image.asset(
+                  'assets/icons/$iconFile',
+                  width: 32,
+                  height: 32,
+                  color: const Color(0xFFFFCC29),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                serviceName,
+                style: const TextStyle(
+                  fontFamily: 'Objective',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Register for this service?",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Objective',
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(0xFF1C2B66),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HomeWrapper(initialIndex: 2),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Register",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Objective',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(0xFFF4F4F4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontFamily: 'Objective',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -187,6 +291,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                         return BounceTap(
                           onTap: () {
                             setState(() => focusedIndex = index);
+                            _showRegisterServiceModal(title, fileName);
                           },
                           child: Container(
                             width: 72,

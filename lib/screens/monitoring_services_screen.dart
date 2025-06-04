@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:halogen/shared/widgets/bounce_tap.dart';
+import 'package:halogen/shared/widgets/underlined_glow_input_field.dart';
 
 class MonitoringServicesScreen extends StatelessWidget {
   const MonitoringServicesScreen({super.key});
 
   void _showPurchaseForm(BuildContext context, String deviceName) {
+    final nameController = TextEditingController();
+    final addressController = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -12,62 +17,65 @@ class MonitoringServicesScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Purchase $deviceName",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Objective',
-                    color: Color(0xFF1C2B66),
-                  ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 24,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 24,
                 ),
-                const SizedBox(height: 20),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: "Full Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Purchase $deviceName",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Objective',
+                        color: Color(0xFF1C2B66),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    UnderlinedGlowInputField(
+                      label: "Full Name",
+                      icon: Icons.person,
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 15),
+                    UnderlinedGlowInputField(
+                      label: "Delivery Address",
+                      icon: Icons.home,
+                      controller: addressController,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFCC29),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Proceed",
+                        style: TextStyle(
+                          fontFamily: 'Objective',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 15),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: "Delivery Address",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFCC29),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    "Proceed",
-                    style: TextStyle(
-                      fontFamily: 'Objective',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -79,7 +87,7 @@ class MonitoringServicesScreen extends StatelessWidget {
     required String title,
     required String description,
   }) {
-    return GestureDetector(
+    return BounceTap(
       onTap: () => _showPurchaseForm(context, title),
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
@@ -169,19 +177,28 @@ class MonitoringServicesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           automaticallyImplyLeading: false,
+          centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text(
-            "Monitoring Services",
-            style: TextStyle(
-              fontFamily: 'Objective',
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1C2B66),
+          title: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 600),
+            builder: (context, value, child) => Opacity(
+              opacity: value,
+              child: child,
+            ),
+            child: const Text(
+              "Monitoring Services",
+              style: TextStyle(
+                fontFamily: 'Objective',
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1C2B66),
+              ),
             ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 60, top: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -211,6 +228,18 @@ class MonitoringServicesScreen extends StatelessWidget {
                 icon: Icons.sensors,
                 title: "Motion Sensor",
                 description: "Instant alerts on unauthorized movement.",
+              ),
+              _buildDeviceTile(
+                context: context,
+                icon: Icons.electric_bolt,
+                title: "Electric Fence",
+                description: "High-voltage perimeter security.",
+              ),
+              _buildDeviceTile(
+                context: context,
+                icon: Icons.gps_fixed,
+                title: "Vehicle Tracker",
+                description: "Track your vehicle location in real time.",
               ),
               const SizedBox(height: 20),
               const Text(

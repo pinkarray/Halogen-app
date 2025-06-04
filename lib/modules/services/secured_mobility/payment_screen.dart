@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:pay_with_paystack/pay_with_paystack.dart';
@@ -19,89 +19,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String? selectedMethod;
   bool isLoading = false;
   bool paymentCancelled = false;
-
-  void _showBankTransferBottomSheet(BuildContext context, int amount) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 28,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 28,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Transfer to the account below:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Account Name: Halogen Test'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Account Number: 0123456789'),
-                      IconButton(
-                        icon: const Icon(Icons.copy, size: 16),
-                        onPressed: () {
-                          Clipboard.setData(const ClipboardData(text: '0123456789'));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Account number copied')),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const Text('Bank: GTBank'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Amount: ${formatCurrency(amount)}',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Cancel'),
-                ),
-                GlowingArrowsButton(
-                  text: "I've sent the money",
-                  onPressed: () {
-                    final provider = context.read<SecuredMobilityProvider>();
-                    provider.markStageComplete(5);
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/secured-mobility/payment-success');
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _processPaystackPayment(int amount, {bool isTransfer = false}) async {
     setState(() {

@@ -7,6 +7,8 @@ class UnderlinedGlowInputField extends StatefulWidget {
   final void Function(String)? onChanged;
   final List<String>? dropdownOptions;
   final TextCapitalization textCapitalization;
+  final bool obscureText;
+  final Widget? suffixIcon;
 
   const UnderlinedGlowInputField({
     super.key,
@@ -16,6 +18,8 @@ class UnderlinedGlowInputField extends StatefulWidget {
     this.onChanged,
     this.dropdownOptions,
     this.textCapitalization = TextCapitalization.none,
+    this.obscureText = false,
+    this.suffixIcon,
   });
 
   @override
@@ -79,7 +83,7 @@ class _UnderlinedGlowInputFieldState extends State<UnderlinedGlowInputField> {
                   ? DropdownButtonFormField<String>(
                       value: _selectedValue,
                       focusNode: _focusNode,
-                      icon: const SizedBox.shrink(), // Hides default arrow
+                      icon: const SizedBox.shrink(), 
                       decoration: InputDecoration(
                         isDense: true,
                         labelText: widget.label,
@@ -135,6 +139,7 @@ class _UnderlinedGlowInputFieldState extends State<UnderlinedGlowInputField> {
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         labelText: widget.label,
+                        suffixIcon: widget.suffixIcon,
                         labelStyle: TextStyle(
                           fontFamily: 'Objective',
                           fontWeight: FontWeight.w500,

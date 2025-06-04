@@ -37,6 +37,16 @@ class SessionManager {
     return jsonDecode(json);
   }
 
+  static Future<void> saveProfileImageUrl(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profileImageUrl', url);
+  }
+
+  static Future<String?> getProfileImageUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('profileImageUrl');
+  }
+
   static Future<void> saveDeviceId(String deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('deviceId', deviceId);

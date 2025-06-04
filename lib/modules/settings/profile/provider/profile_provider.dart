@@ -10,9 +10,14 @@ class ProfileProvider extends ChangeNotifier {
   bool get isLoaded => _user != null;
 
   Future<void> loadUser() async {
-    final profile = await SessionManager.getUserProfile();
-    _user = profile;
-    notifyListeners();
+    try {
+      final profile = await ProfileApiService.getProfile();
+      await SessionManager.saveUserProfile(profile); // optional
+      _user = profile;
+      notifyListeners();
+    } catch (e) {
+      print('❌ Failed to load profile: $e');
+    }
   }
 
   void updateField(String key, dynamic value) {

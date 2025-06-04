@@ -29,7 +29,8 @@ class GlowingArrowsButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (showLoader)
                 const SizedBox(

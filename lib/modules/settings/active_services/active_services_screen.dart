@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:halogen/shared/widgets/home_wrapper.dart';
 import '../../../shared/widgets/halogen_back_button.dart';
 
 class ActiveServicesScreen extends StatelessWidget {
@@ -49,9 +50,15 @@ class ActiveServicesScreen extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/services');
-                },
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeWrapper(initialIndex: 1),
+                        ),
+                      );
+                    },
                 child: const Text(
                   'Subscribe Now',
                   style: TextStyle(

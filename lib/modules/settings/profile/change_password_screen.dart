@@ -1,5 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:halogen/shared/widgets/halogen_back_button.dart';
+import 'package:halogen/shared/widgets/underlined_glow_password_field.dart';
+import 'package:halogen/shared/helpers/session_manager.dart';
+import 'package:halogen/shared/widgets/glowing_arrows_button.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -15,23 +20,54 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final _confirmController = TextEditingController();
 
   bool _isLoading = false;
-  bool _obscure = true;
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_newController.text != _confirmController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
-    // TODO: Add real backend request
-    await Future.delayed(const Duration(seconds: 1));
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse('http://185.203.216.113:3004/api/v1/profile/change-password');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'old_password': _currentController.text.trim(),
+          'password': _newController.text.trim(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Password changed successfully')),
+        );
+        Navigator.pop(context);
+      } else {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Failed to change password')),
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred. Please try again.')),
+      );
+    }
 
     setState(() => _isLoading = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Password changed successfully')),
-    );
-
-    Navigator.pop(context);
   }
 
   @override
@@ -59,67 +95,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           key: _formKey,
           child: Column(
             children: [
-              _passwordField(_currentController, 'Current Password'),
-              const SizedBox(height: 16),
-              _passwordField(_newController, 'New Password'),
-              const SizedBox(height: 16),
-              _passwordField(_confirmController, 'Confirm New Password',
-                  confirm: true),
+              UnderlinedGlowPasswordField(
+                label: 'Current Password',
+                icon: Icons.lock_outline,
+                controller: _currentController,
+              ),
+              UnderlinedGlowPasswordField(
+                label: 'New Password',
+                icon: Icons.lock_outline,
+                controller: _newController,
+              ),
+              UnderlinedGlowPasswordField(
+                label: 'Confirm New Password',
+                icon: Icons.lock_outline,
+                controller: _confirmController,
+              ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1C2B66),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'Change Password',
-                          style: TextStyle(
-                            fontFamily: 'Objective',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
+              GlowingArrowsButton(
+                text: 'Change Password',
+                showLoader: _isLoading,
+                onPressed: _submit,
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _passwordField(TextEditingController controller, String label,
-      {bool confirm = false}) {
-    return TextFormField(
-      controller: controller,
-      obscureText: _obscure,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscure ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black,
-          ),
-          onPressed: () => setState(() => _obscure = !_obscure),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Required';
-        if (confirm && value != _newController.text) return 'Passwords do not match';
-        if (!confirm && controller == _newController && value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
     );
   }
 }
