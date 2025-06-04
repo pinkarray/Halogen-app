@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:halogen/security_profile/models/option_model.dart';
+import 'package:halogen/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/question_model.dart';
@@ -144,24 +146,17 @@ class SecurityProfileProvider with ChangeNotifier {
 
   void saveAnswer(String questionId, dynamic answer) {
     _answers[questionId] = answer;
-
+  
     // Update spouse toggle
     if (questionId == 'SP-PP-MS') {
       _showSpouseProfile = answer == 'Married';
     }
     
-
     notifyListeners();
   }
 
-  void removeAnswer(String questionId) {
-    if (_answers.containsKey(questionId)) {
-      _answers.remove(questionId);
-      notifyListeners();
-    }
-  }
-
-  Future<void> submitAnswer({
+  // Keep only this implementation
+  Future<bool> submitAnswer({
     required String questionId,
     String? optionId,
     required String value,
@@ -195,13 +190,65 @@ class SecurityProfileProvider with ChangeNotifier {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('[submitAnswer] Answer sent successfully');
+        return true;
       } else {
         print('[submitAnswer] Failed: ${response.body}');
+        return false;
       }
     } catch (e) {
       print('[submitAnswer] Error: $e');
+      return false;
     }
   }
+
+  void removeAnswer(String questionId) {
+    if (_answers.containsKey(questionId)) {
+      _answers.remove(questionId);
+      notifyListeners();
+    }
+  }
+
+  // Future<void> submitAnswer({
+  //   required String questionId,
+  //   String? optionId,
+  //   required String value,
+  //   required String label,
+  //   Map<String, dynamic>? info,
+  // }) async {
+  //   final token = await SessionManager.getAuthToken();
+  //   final url = Uri.parse('$baseUrl/answers');
+
+  //   final body = {
+  //     "answers": [
+  //       {
+  //         "question_id": questionId,
+  //         "option_id": optionId,
+  //         "value": value,
+  //         "label": label,
+  //         "info": info ?? {}
+  //       }
+  //     ]
+  //   };
+
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: json.encode(body),
+  //     );
+
+  //     if (response.statusCode == 201 || response.statusCode == 200) {
+  //       print('[submitAnswer] Answer sent successfully');
+  //     } else {
+  //       print('[submitAnswer] Failed: ${response.body}');
+  //     }
+  //   } catch (e) {
+  //     print('[submitAnswer] Error: $e');
+  //   }
+  // }
 
   Future<List<Map<String, dynamic>>> fetchSubmittedAnswers() async {
     final token = await SessionManager.getAuthToken();
@@ -248,7 +295,15 @@ class SecurityProfileProvider with ChangeNotifier {
         print('[fetchSecurityReport] Success');
         return report;
       } else {
-        print('[fetchSecurityReport] Failed: ${response.body}');
+        print('[fetchSecurityReport] Failed: ${response.statusCode} - ${response.body}');
+        
+        // If report not found, it might be because answers haven't been processed yet
+        if (response.statusCode == 404) {
+          // Wait a moment and try again
+          await Future.delayed(const Duration(seconds: 2));
+          return fetchSecurityReport(); // Recursive call with retry
+        }
+        
         return null;
       }
     } catch (e) {
@@ -293,6 +348,8 @@ class SecurityProfileProvider with ChangeNotifier {
     return _sectionQuestions.values.expand((qList) => qList).toList();
   }
 
+  get profileProvider => null;
+
   List<QuestionModel> getAllOrderedQuestions(String sectionCode) {
     return _sectionQuestions[sectionCode] ?? [];
   }
@@ -313,5 +370,77 @@ class SecurityProfileProvider with ChangeNotifier {
 
   void clearCompletedIndicesAbove(int count, Set<int> indices) {
     indices.removeWhere((i) => i >= count);
+  }
+}
+
+
+Future<bool> submitAllAnswers(dynamic _answers) async {
+  final token = await SessionManager.getAuthToken();
+  final url = Uri.parse('$baseUrl/answers');
+
+  // Convert answers map to the format expected by the API
+  final List<Map<String, dynamic>> answersList = [];
+  
+  _answers.forEach((questionId, value, dynamic _sectionQuestions) {
+    // Find the question to get its label
+    QuestionModel? question;
+    for (final section in _sectionQuestions.values) {
+      final found = section.firstWhere(
+        (q) => q.id == questionId,
+        orElse: () => QuestionModel.empty(),
+      );
+      if (found.id.isNotEmpty) {
+        question = found;
+        break;
+      }
+    }
+    
+    if (question != null && value != null && value.toString().isNotEmpty) {
+      // For dropdown questions, find the option ID
+      String? optionId;
+      if (question.type == 'dropdown') {
+        final option = question.options.firstWhere(
+          (o) => o.label == value.toString(),
+          orElse: () => OptionModel(id: '', label: '', score: 0),
+        );
+        if (option.id.isNotEmpty) {
+          optionId = option.id;
+        }
+      }
+      
+      answersList.add({
+        "question_id": questionId,
+        "option_id": optionId,
+        "value": value.toString(),
+        "label": question.question,
+        "info": {}
+      });
+    }
+  });
+  
+  if (answersList.isEmpty) return true; // Nothing to submit
+  
+  final body = {"answers": answersList};
+  
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      print('[submitAllAnswers] ${answersList.length} answers sent successfully');
+      return true;
+    } else {
+      print('[submitAllAnswers] Failed: ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    print('[submitAllAnswers] Error: $e');
+    return false;
   }
 }

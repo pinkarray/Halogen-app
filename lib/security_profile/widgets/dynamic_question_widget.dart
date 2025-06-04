@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:halogen/security_profile/models/option_model.dart';
 import 'package:provider/provider.dart';
 import '../models/question_model.dart';
 import '../../providers/user_form_data_provider.dart';
@@ -306,18 +307,32 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
       controller.text = savedAnswer.toString();
     }
 
+    // Inside the build method, update the onChanged callback for dropdown fields
     if (isDropdown) {
       return CustomDropdownField(
         label: widget.question.question + labelSuffix,
         icon: icon,
         options: dropdownLabels,
         selectedValue: controller.text.isEmpty ? null : controller.text,
-        onChanged: (val) {
+        onChanged: (val) async {
           if (controller.text != val) {
             controller.text = val;
             provider.saveAnswer(getAnswerKey(), val);
+            
+            // Submit answer to server
+            final optionId = widget.question.options
+                .firstWhere((o) => o.label == val, orElse: () => OptionModel(id: '', label: '', score: 0))
+                .id;
+                
+            await provider.submitAnswer(
+              questionId: widget.question.id,
+              optionId: optionId.isNotEmpty ? optionId : null,
+              value: val,
+              label: widget.question.question,
+            );
+            
             widget.onCompleted?.call();
-
+    
             if (widget.sectionCode != null) {
               final formProvider = context.read<UserFormDataProvider>();
               Future.microtask(() {
@@ -325,24 +340,39 @@ class _DynamicQuestionWidgetState extends State<DynamicQuestionWidget> {
               });
             }
           }
-
+    
           if (widget.question.refCode == 'SP-PP-MS') {
             provider.showSpouseProfile = val == 'Married';
           }
         },
       );
     }
-
+    
+    // Update the onChanged callback for text fields
     return CustomTextField(
       label: widget.question.question + labelSuffix,
       icon: icon,
       controller: controller,
-      onChanged: (val) {
+      onChanged: (val) async {
         controller.text = val;
         final key = getAnswerKey();
         provider.saveAnswer(key, val);
+        
+        // Submit answer to server after a short delay to avoid too many requests
+        // while typing
+        if (val.isNotEmpty) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (controller.text == val) { // Only submit if value hasn't changed
+            await provider.submitAnswer(
+              questionId: widget.question.id,
+              value: val,
+              label: widget.question.question,
+            );
+          }
+        }
+        
         print('[INPUT] Saved $key = $val');
-
+    
         Future.microtask(() {
           widget.onCompleted?.call();
         });

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:halogen/security_profile/providers/security_profile_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/user_form_data_provider.dart';
 import '../../../security_profile/providers/security_profile_provider.dart';
+import '../../../security_profile/providers/security_profile_provider.dart' as profileProvider;
 import '../../../shared/widgets/custom_progress_bar.dart';
 import '../../../shared/helpers/session_manager.dart';
 import '../../../security_profile/widgets/dynamic_question_widget.dart';
@@ -817,32 +819,32 @@ class _ContinueRegistrationScreenState
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _initializeRegistration(),
-    );
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback(
+    (_) => _initializeRegistration(),
+  );
+}
+
+ Future<void> _initializeRegistration() async {
+  final provider = context.read<SecurityProfileProvider>();
+  final userProvider = context.read<UserFormDataProvider>();
+
+  try {
+    await provider.createOrFetchSecurityProfile();
+    await provider.fetchQuestions();
+    await provider.fetchSubmittedAnswers();
+
+    userProvider.setOnboardingStage(2);
+    await SessionManager.saveStage(2);
+  } catch (e) {
+    print('[ContinueRegistration] Initialization error: $e');
   }
 
-  Future<void> _initializeRegistration() async {
-    final provider = context.read<SecurityProfileProvider>();
-    final userProvider = context.read<UserFormDataProvider>();
-
-    try {
-      await provider.createOrFetchSecurityProfile();
-      await provider.fetchQuestions();
-      await provider.fetchSubmittedAnswers();
-
-      userProvider.setOnboardingStage(2);
-      await SessionManager.saveStage(2);
-    } catch (e) {
-      print('[ContinueRegistration] Initialization error: $e');
-    }
-
-    setState(() {
-      _isInitializing = false;
-    });
-  }
+  setState(() {
+    _isInitializing = false;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -1347,39 +1349,64 @@ class _ContinueRegistrationScreenState
                         ),
                       ),
                     ),
-                    if (canViewReport) ...[
-                            const SizedBox(height: 24),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const SecurityReportScreen(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1C2B66),
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "View Report",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Objective',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 100),
-                          ],
+                    if (canViewReport) ...[  
+  const SizedBox(height: 24),
+  SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: () async {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+        
+        // Submit all answers to ensure everything is saved
+        final success = await profileProvider.profileProvider.submitAllAnswers();
+        
+        // Close loading indicator
+        Navigator.pop(context);
+        
+        if (success) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const SecurityReportScreen(),
+            ),
+          );
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to submit answers. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF1C2B66),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text(
+        "View Report",
+        style: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Objective',
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  ),
+  const SizedBox(height: 100),
+],
                   ],
                 ),
               ),

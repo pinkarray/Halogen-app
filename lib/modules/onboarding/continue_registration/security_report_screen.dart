@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:halogen/security_profile/providers/security_profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../../../security_profile/providers/security_profile_provider.dart';
 import '../../../shared/widgets/custom_progress_bar.dart';
 import '../../../providers/user_form_data_provider.dart';
 import '../../../shared/helpers/session_manager.dart';
@@ -29,6 +29,12 @@ class _SecurityReportScreenState extends State<SecurityReportScreen> {
     final profileProvider = context.read<SecurityProfileProvider>();
     final userProvider = context.read<UserFormDataProvider>();
 
+    // Submit all answers before fetching the report
+    await profileProvider.profileProvider.submitAllAnswers();
+    
+    // Add a small delay to ensure server processes the answers
+    await Future.delayed(const Duration(seconds: 1));
+    
     final data = await profileProvider.fetchSecurityReport();
 
     // ✅ Mark user as fully registered
