@@ -120,6 +120,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   fontFamily: 'Objective',
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: Color(0xFF1C2B66),
                 ),
               ),
               const SizedBox(height: 8),
@@ -238,13 +239,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Objective',
+                                  color: Color(0xFF1C2B66),
                                 ),
                               ),
                               const Text(
                                 "You can view your profile from here",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: Color(0xFF1C2B66),
                                 ),
                               ),
                             ],
@@ -267,6 +269,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Objective',
+                    color: Color(0xFF1C2B66),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -337,7 +340,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                                   style: const TextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
+                                                    color: Color(0xFF1C2B66),
                                                     fontFamily: 'Objective',
                                                   ),
                                                   textAlign: TextAlign.center,
@@ -388,6 +391,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Objective',
+                    color: Color(0xFF1C2B66),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -426,7 +430,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
     return BounceTap(
       onTap: () {
         debugPrint("Tapped on: $title");
-        // Optional: Navigate or show full blog
       },
       child: Container(
         width: 200,
@@ -584,6 +587,7 @@ class _CategoryTile extends StatelessWidget {
                     fontFamily: 'Objective',
                     fontWeight: FontWeight.bold,
                     fontSize: 11.5,
+                    color: Color(0xFF1C2B66),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

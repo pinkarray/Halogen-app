@@ -72,13 +72,16 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
+    return PopScope(
+      canPop: false, 
+      child: Scaffold(
+        extendBody: true,
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: _buildCustomBottomNavigationBar(),
       ),
-      bottomNavigationBar: _buildCustomBottomNavigationBar(),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:halogen/shared/widgets/halogen_back_button.dart';
 
@@ -17,6 +18,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   bool _isLoading = true;
   bool _hasPermission = false;
 
+  static const _storageKey = 'emergency_contact_ids';
+
   @override
   void initState() {
     super.initState();
@@ -26,10 +29,9 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   Future<void> _checkPermissionAndLoadContacts() async {
     final status = await Permission.contacts.request();
     if (status.isGranted) {
-      setState(() {
-        _hasPermission = true;
-      });
+      setState(() => _hasPermission = true);
       await _loadContacts();
+      await _loadSavedEmergencyContacts();
     } else {
       setState(() {
         _hasPermission = false;
@@ -40,36 +42,62 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   Future<void> _loadContacts() async {
     try {
-      final contacts = await FlutterContacts.getContacts();
+      final contacts = await FlutterContacts.getContacts(withProperties: true);
       setState(() {
         _deviceContacts = contacts.toList();
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading contacts: $e')),
       );
     }
   }
 
-  void _addEmergencyContact(Contact contact) {
+  Future<void> _loadSavedEmergencyContacts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedIds = prefs.getStringList(_storageKey) ?? [];
+
+    final restoredContacts = _deviceContacts.where((contact) => savedIds.contains(contact.id)).toList();
+
     setState(() {
-      if (!_emergencyContacts.contains(contact)) {
+      _emergencyContacts.clear();
+      _emergencyContacts.addAll(restoredContacts);
+    });
+  }
+
+  Future<void> _saveEmergencyContacts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = _emergencyContacts.map((c) => c.id).toList();
+    await prefs.setStringList(_storageKey, ids);
+  }
+
+  void _addEmergencyContact(Contact contact) {
+    if (_emergencyContacts.length >= 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You can only select up to 5 emergency contacts')),
+      );
+      return;
+    }
+
+    setState(() {
+      if (!_emergencyContacts.any((c) => c.id == contact.id)) {
         _emergencyContacts.add(contact);
+        _saveEmergencyContacts();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${contact.displayName} added as emergency contact')),
+        );
       }
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${contact.displayName} added as emergency contact')),
-    );
   }
 
   void _removeEmergencyContact(Contact contact) {
     setState(() {
       _emergencyContacts.removeWhere((c) => c.id == contact.id);
+      _saveEmergencyContacts();
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${contact.displayName} removed from emergency contacts')),
     );
@@ -197,12 +225,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     ),
                   ),
                   title: Text(
-                    contact.displayName ?? 'Unknown',
+                    contact.displayName,
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
                     contact.phones.isNotEmpty == true
-                        ? contact.phones.first.number ?? 'No phone'
+                        ? contact.phones.first.number
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),
@@ -265,12 +293,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     ),
                   ),
                   title: Text(
-                    contact.displayName ?? 'Unknown',
+                    contact.displayName,
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
                     contact.phones.isNotEmpty == true
-                        ? contact.phones.first.number ?? 'No phone'
+                        ? contact.phones.first.number
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),

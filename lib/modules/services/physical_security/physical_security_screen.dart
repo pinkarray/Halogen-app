@@ -209,7 +209,17 @@ class _PhysicalSecurityScreenState extends State<PhysicalSecurityScreen> {
                         },
                         child: Row(
                           children: [
-                            const Icon(Icons.location_pin, color: Colors.red),
+                            ShaderMask(
+                              shaderCallback: (Rect bounds) {
+                                return const LinearGradient(
+                                  colors: [Color(0xFF1C2B66), Color(0xFFFFCC29)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.srcIn,
+                              child: const Icon(Icons.location_pin, size: 20),
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -219,12 +229,13 @@ class _PhysicalSecurityScreenState extends State<PhysicalSecurityScreen> {
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontFamily: 'Objective',
-                                  color: provider.addressConfirmed ? Colors.black : Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  color: provider.addressConfirmed ? Colors.black : const Color(0xFF1C2B66),
                                 ),
                               ),
                             ),
                           ],
-                        ),
+                        ).animate().fade(duration: 300.ms).slideY(begin: 0.2),
                       ),
                       const SizedBox(height: 24),
                       GlowingArrowsButton(

@@ -15,20 +15,20 @@ class QuickActionsService {
     quickActions.setShortcutItems([
       const ShortcutItem(
         type: 'emergency_contacts',
-        localizedTitle: 'Go to emergency contact',
-        icon: 'ic_emergency_contact',
+        localizedTitle: 'Emergency contact',
+        icon: 'logocut',
       ),
       const ShortcutItem(
         type: 'sos',
-        localizedTitle: 'Go to SOS',
-        icon: 'ic_sos',
+        localizedTitle: 'SOS',
+        icon: 'logocut',
       ),
     ]);
   }
 
   void _handleQuickAction(String shortcutType) {
     if (shortcutType == 'emergency_contacts') {
-      navigatorKey.currentState?.pushNamed('/profile-page');
+      navigatorKey.currentState?.pushNamed('/emergency-contacts');
     } else if (shortcutType == 'sos') {
       navigatorKey.currentState?.pushNamed('/sos');
     }

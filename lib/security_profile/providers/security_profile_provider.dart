@@ -374,17 +374,17 @@ class SecurityProfileProvider with ChangeNotifier {
 }
 
 
-Future<bool> submitAllAnswers(dynamic _answers) async {
+Future<bool> submitAllAnswers(dynamic answers) async {
   final token = await SessionManager.getAuthToken();
   final url = Uri.parse('$baseUrl/answers');
 
   // Convert answers map to the format expected by the API
   final List<Map<String, dynamic>> answersList = [];
   
-  _answers.forEach((questionId, value, dynamic _sectionQuestions) {
+  answers.forEach((questionId, value, dynamic sectionQuestions) {
     // Find the question to get its label
     QuestionModel? question;
-    for (final section in _sectionQuestions.values) {
+    for (final section in sectionQuestions.values) {
       final found = section.firstWhere(
         (q) => q.id == questionId,
         orElse: () => QuestionModel.empty(),

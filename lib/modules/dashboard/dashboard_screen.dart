@@ -126,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Text(
-                  "Filter services",
+                  "Filters",
                   style: TextStyle(
                     fontFamily: 'Objective',
                     fontWeight: FontWeight.bold,
@@ -250,6 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   fontSize: 16,
                                   fontFamily: 'Objective',
                                   fontWeight: FontWeight.w500,
+                                  color: Color(0xFF1C2B66),
                                 ),
                               ),
                               IconButton(

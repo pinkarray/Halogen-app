@@ -63,7 +63,7 @@ class _GreetingHeaderState extends State<GreetingHeader> {
                 "Your security is in check",
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.blueGrey,
+                  color: Color(0xFF1C2B66),
                   fontFamily: 'Objective',
                 ),
               ),
