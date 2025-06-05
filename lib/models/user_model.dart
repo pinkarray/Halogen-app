@@ -8,8 +8,6 @@ class UserModel {
   final String type;
   final String? password;
 
-  var deviceId;
-
   UserModel({
     required this.fullName,
     required this.email,
@@ -41,6 +39,8 @@ class UserModel {
   /// Extract first and last name assuming space split
   String get firstName => fullName.split(" ").first;
   String get lastName => fullName.split(" ").skip(1).join(" ");
+
+  get deviceId => null;
 
   /// Autofill method for SignUpProvider
   void autofillSignUp(SignUpProvider provider) {
