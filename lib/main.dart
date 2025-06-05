@@ -88,6 +88,16 @@ class _HalogenAppState extends State<HalogenApp> {
     _quickActionsService = QuickActionsService(navigatorKey: navigatorKey);
     _quickActionsService.initialize();
     _languageProvider.loadSavedLocale();
+    
+    // Remove the Provider.of line completely
+  }
+
+  // Add this method instead
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // This is the correct place to access Provider
+    Provider.of<ThemeProvider>(context, listen: false).loadSavedTheme();
   }
 
   @override
