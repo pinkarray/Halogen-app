@@ -8,6 +8,8 @@ class UserModel {
   final String type;
   final String? password;
 
+  var deviceId;
+
   UserModel({
     required this.fullName,
     required this.email,

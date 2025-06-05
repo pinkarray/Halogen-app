@@ -159,6 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // Update the build method in _DashboardScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,61 +173,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 10),
               const GreetingHeader().animate().fadeIn(duration: 500.ms).slideY(begin: -0.2),
               const SizedBox(height: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DashboardSearchBar(
-                    controller: _searchController,
-                    onChanged: (query) {
-                      setState(() {
-                        _searchQuery = query;
-                      });
-                    },
-                  ).animate().fadeIn(duration: 500.ms).slideX(begin: -0.3),
-                  const SizedBox(height: 8),
-                  if (_searchQuery.isNotEmpty && _filteredServices.isNotEmpty)
-                    Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade200),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 250),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _filteredServices.length,
-                        itemBuilder: (_, index) {
-                          final s = _filteredServices[index];
-                          return ListTile(
-                            leading: Icon(
-                              s['icon'] ?? Icons.security,
-                              size: 22,
-                              color: const Color(0xFF1C2B66),
-                            ),
-                            title: Text(
-                              s['title'],
-                              style: const TextStyle(fontFamily: 'Objective'),
-                            ),
-                            onTap: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-
-                              if (s.containsKey('route')) {
-                                Navigator.pushNamed(context, s['route']);
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              DashboardSearchBar(
+                controller: _searchController,
+                onChanged: (query) {
+                  setState(() {
+                    _searchQuery = query;
+                  });
+                },
+              ).animate().fadeIn(duration: 500.ms).slideX(begin: -0.3),
               const SizedBox(height: 20),
               if (_isRegistered) ...[
                 Text(
-                  "Services (${_filteredServices.length})",
+                  "Services",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -261,18 +219,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           const SizedBox(height: 10),
                           Expanded(
-                            child: ListView.builder(
-                              itemCount: _filteredServices.length,
-                              itemBuilder: (_, index) {
-                                final s = _filteredServices[index];
-                                return ServiceTile(
-                                  title: s['title'],
-                                  status: s['status'],
-                                  isActive: s['isActive'],
-                                  icon: s['icon'] ?? Icons.security,
-                                );
-                              },
-                            ),
+                            child: _searchQuery.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: _filteredServices.length,
+                                    itemBuilder: (context, index) {
+                                      final service = _filteredServices[index];
+                                      return ServiceTile(
+                                        title: service['title'],
+                                        status: service['status'],
+                                        isActive: service['isActive'],
+                                        icon: service['icon'],
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    itemCount: _filteredServices.length,
+                                    itemBuilder: (context, index) {
+                                      final service = _filteredServices[index];
+                                      return ServiceTile(
+                                        title: service['title'],
+                                        status: service['status'],
+                                        isActive: service['isActive'],
+                                        icon: service['icon'],
+                                      );
+                                    },
+                                  ),
                           ),
                         ],
                       ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1)
@@ -357,58 +328,80 @@ class ServiceTile extends StatelessWidget {
   Color _getStatusColor() {
     if (status.toLowerCase().contains('issue')) return Colors.red;
     if (status == 'No subscription') return Colors.grey;
-    return isActive ? Colors.green : Colors.grey;
+    return isActive ? Colors.green : Colors.orange;
+  }
+
+  String _getStatusLabel() {
+    if (status.toLowerCase().contains('issue')) return 'Issue';
+    if (status == 'No subscription') return 'No Subscription';
+    return isActive ? 'Active' : 'Inactive';
   }
 
   @override
   Widget build(BuildContext context) {
     return BounceTap(
-      onTap: () {}, // Add actual interaction later
+      onTap: () {}, // Hook up service navigation
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(16),
+          color: const Color(0xFFF8F9FF),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(0, 2),
+              color: Colors.grey.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 24, color: const Color(0xFF1C2B66)), 
-            const SizedBox(width: 12),
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: const Color(0xFFE3E7F3),
+              child: Icon(icon, color: const Color(0xFF1C2B66), size: 24),
+            ),
+            const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Objective',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'Objective',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1C2B66),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor().withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _getStatusLabel(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'Objective',
+                        fontWeight: FontWeight.w500,
+                        color: _getStatusColor(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              status,
-              style: TextStyle(
-                fontSize: 13,
-                fontFamily: 'Objective',
-                color: _getStatusColor(),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.circle,
-              size: 10,
-              color: _getStatusColor(),
-            ),
+            const Icon(Icons.chevron_right, color: Color(0xFF1C2B66), size: 24),
           ],
         ),
       ),
     );
   }
 }
+

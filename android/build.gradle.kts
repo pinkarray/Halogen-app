@@ -13,9 +13,14 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
-    project.evaluationDependsOn(":app")
+    project.plugins.withType<JavaPlugin> {
+        project.extensions.configure<JavaPluginExtension> {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(11))
+            }
+        }
+    }
 }
-
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
