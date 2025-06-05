@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'modules/settings/language/provider/language_provider.dart';
 import 'providers/user_form_data_provider.dart';
 import 'screens/splash_screen.dart';
 import 'modules/login/login_provider.dart';
@@ -62,7 +64,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ServiceProvider()),
-        
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
       child: const HalogenApp(),
     ),
@@ -78,22 +80,36 @@ class HalogenApp extends StatefulWidget {
 
 class _HalogenAppState extends State<HalogenApp> {
   late QuickActionsService _quickActionsService;
+  final LanguageProvider _languageProvider = LanguageProvider();
   
   @override
   void initState() {
     super.initState();
     _quickActionsService = QuickActionsService(navigatorKey: navigatorKey);
     _quickActionsService.initialize();
+    _languageProvider.loadSavedLocale();
   }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final languageProvider = context.watch<LanguageProvider>();
+    
     return MaterialApp(
       navigatorKey: navigatorKey, // Add the navigator key
       title: "Halogen",
       debugShowCheckedModeBanner: false,
       themeMode: themeProvider.themeMode,
+      locale: languageProvider.currentLocale,
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('fr'), // French
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
@@ -187,6 +203,95 @@ class _HalogenAppState extends State<HalogenApp> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontFamily: 'Objective'),
+          ),
+        ),
+      ),
+      darkTheme: ThemeData(
+        primaryColor: Colors.white,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        fontFamily: 'Objective',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.white,
+          brightness: Brightness.dark,
+        ),
+        timePickerTheme: TimePickerThemeData(
+          backgroundColor: const Color(0xFF2C2C2C),
+          hourMinuteTextColor: Colors.white,
+          dayPeriodTextColor: Colors.white,
+          dayPeriodShape: RoundedRectangleBorder(),
+          dayPeriodColor: WidgetStateColor.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? const Color(0xFFFFCC29)
+                : const Color(0xFF2C2C2C),
+          ),
+          dialHandColor: Colors.white,
+          dialBackgroundColor: const Color(0xFF3C3C3C),
+          hourMinuteColor: const Color(0xFF3C3C3C),
+          entryModeIconColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+        ),
+        datePickerTheme: DatePickerThemeData(
+          backgroundColor: const Color(0xFF2C2C2C),
+          headerForegroundColor: Colors.white,
+          todayBackgroundColor: WidgetStatePropertyAll(Colors.white),
+          todayForegroundColor: WidgetStatePropertyAll(Colors.black),
+          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const Color(0xFFFFCC29);
+            }
+            return null;
+          }),
+          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.black;
+            }
+            return Colors.white;
+          }),
+          dayOverlayColor: WidgetStatePropertyAll(Colors.transparent),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontFamily: 'Objective'),
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          labelStyle: TextStyle(color: Colors.white),
+          suffixIconColor: Colors.white,
+        ),
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: Colors.white,
+          selectionColor: Colors.white54,
+          selectionHandleColor: Colors.white,
+        ),
+        checkboxTheme: CheckboxThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          side: const BorderSide(color: Colors.white, width: 1.5),
+          fillColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return Colors.white;
+            return Colors.transparent;
+          }),
+          checkColor: WidgetStateProperty.all(Colors.black),
+        ),
+        radioTheme: RadioThemeData(
+          fillColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return Colors.white;
+          }),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             textStyle: const TextStyle(fontFamily: 'Objective'),
           ),
         ),
