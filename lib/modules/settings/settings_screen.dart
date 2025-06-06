@@ -136,16 +136,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   }),
                 ]),
 
-                const SizedBox(height: 20),
-                _sectionTitle("Preferences"),
-                _settingsGroup([
-                  _buildSettingTile(Icons.dark_mode_outlined, "App Theme", () {
-                    Navigator.pushNamed(context, '/theme-settings');
-                  }),
-                  _buildSettingTile(Icons.language_outlined, "Language", () {
-                    Navigator.pushNamed(context, '/language-settings');
-                  }),
-                ]),
+                // const SizedBox(height: 20),
+                // _sectionTitle("Preferences"),
+                // _settingsGroup([
+                //   _buildSettingTile(Icons.dark_mode_outlined, "App Theme", () {
+                //     Navigator.pushNamed(context, '/theme-settings');
+                //   }),
+                //   _buildSettingTile(Icons.language_outlined, "Language", () {
+                //     Navigator.pushNamed(context, '/language-settings');
+                //   }),
+                // ]),
 
                 const SizedBox(height: 20),
                 _sectionTitle("Help & Info"),
