@@ -57,6 +57,7 @@ dependencies:
   image_picker: ^1.0.0
   http_parser: ^4.0.2
   mime: ^1.0.4
+  
 
 dev_dependencies:
   flutter_test:
@@ -71,10 +72,10 @@ dev_dependencies:
   # rules and activating additional ones.
   
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+  # For information on the generic Dart part of this file, see the
+  # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
+  # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
 

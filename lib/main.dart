@@ -191,6 +191,7 @@ class _HalogenAppState extends State<HalogenApp> {
           ),
         ),
       ),
+      
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),

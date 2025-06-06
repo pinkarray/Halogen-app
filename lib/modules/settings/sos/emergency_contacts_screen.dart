@@ -225,12 +225,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     ),
                   ),
                   title: Text(
-                    contact.displayName,
+                    contact.displayName ?? 'Unknown',
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
                     contact.phones.isNotEmpty == true
-                        ? contact.phones.first.number
+                        ? contact.phones.first.number ?? 'No phone'
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),
@@ -293,12 +293,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                     ),
                   ),
                   title: Text(
-                    contact.displayName,
+                    contact.displayName ?? 'Unknown',
                     style: const TextStyle(fontFamily: 'Objective'),
                   ),
                   subtitle: Text(
                     contact.phones.isNotEmpty == true
-                        ? contact.phones.first.number
+                        ? contact.phones.first.number ?? 'No phone'
                         : 'No phone number',
                     style: const TextStyle(fontFamily: 'Objective', fontSize: 12),
                   ),

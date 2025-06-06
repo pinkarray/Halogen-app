@@ -26,6 +26,7 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
 
   late final List<AnimationController> _controllers;
   late final List<Animation<double>> _scaleAnimations;
+  
 
   @override
   void initState() {
@@ -73,7 +74,7 @@ class _HomeWrapperState extends State<HomeWrapper> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, 
+      canPop: false, // Prevents swipe or back gestures from popping the screen
       child: Scaffold(
         extendBody: true,
         body: IndexedStack(
