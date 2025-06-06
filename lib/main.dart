@@ -78,7 +78,7 @@ class HalogenApp extends StatefulWidget {
   State<HalogenApp> createState() => _HalogenAppState();
 }
 
-class _HalogenAppState extends State<HalogenApp> {
+class _HalogenAppState extends State<HalogenApp> with WidgetsBindingObserver {
   late QuickActionsService _quickActionsService;
   final LanguageProvider _languageProvider = LanguageProvider();
   
@@ -87,40 +87,44 @@ class _HalogenAppState extends State<HalogenApp> {
     super.initState();
     _quickActionsService = QuickActionsService(navigatorKey: navigatorKey);
     _quickActionsService.initialize();
-    _languageProvider.loadSavedLocale();
-    
-    // Remove the Provider.of line completely
+    // Remove this line
+    // _languageProvider.loadSavedLocale();
   }
-
-  // Add this method instead
+  
+  // Remove the first build method that throws UnimplementedError
+  
+  // Fix the indentation in didChangeDependencies
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // This is the correct place to access Provider
-    Provider.of<ThemeProvider>(context, listen: false).loadSavedTheme();
+    // Comment out or remove the following line
+    // Provider.of<ThemeProvider>(context, listen: false).loadSavedTheme();
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
-    final languageProvider = context.watch<LanguageProvider>();
+    // Remove these lines
+    // final themeProvider = context.watch<ThemeProvider>(); 
+    // final languageProvider = context.watch<LanguageProvider>();
     
     return MaterialApp(
-      navigatorKey: navigatorKey, // Add the navigator key
+      navigatorKey: navigatorKey,
       title: "Halogen",
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.themeMode,
-      locale: languageProvider.currentLocale,
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('fr'), // French
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      // Remove these lines
+      // themeMode: themeProvider.themeMode,
+      // locale: languageProvider.currentLocale,
+      // supportedLocales: const [
+      //   Locale('en'), // English
+      //   Locale('fr'), // French
+      // ],
+      // localizationsDelegates: const [
+      //   GlobalMaterialLocalizations.delegate,
+      //   GlobalWidgetsLocalizations.delegate,
+      //   GlobalCupertinoLocalizations.delegate,
+      // ],
       theme: ThemeData(
+        // Keep your light theme configuration
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Objective',
@@ -217,95 +221,8 @@ class _HalogenAppState extends State<HalogenApp> {
           ),
         ),
       ),
-      darkTheme: ThemeData(
-        primaryColor: Colors.white,
-        scaffoldBackgroundColor: const Color(0xFF121212),
-        fontFamily: 'Objective',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.white,
-          brightness: Brightness.dark,
-        ),
-        timePickerTheme: TimePickerThemeData(
-          backgroundColor: const Color(0xFF2C2C2C),
-          hourMinuteTextColor: Colors.white,
-          dayPeriodTextColor: Colors.white,
-          dayPeriodShape: RoundedRectangleBorder(),
-          dayPeriodColor: WidgetStateColor.resolveWith(
-            (states) => states.contains(WidgetState.selected)
-                ? const Color(0xFFFFCC29)
-                : const Color(0xFF2C2C2C),
-          ),
-          dialHandColor: Colors.white,
-          dialBackgroundColor: const Color(0xFF3C3C3C),
-          hourMinuteColor: const Color(0xFF3C3C3C),
-          entryModeIconColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
-        ),
-        datePickerTheme: DatePickerThemeData(
-          backgroundColor: const Color(0xFF2C2C2C),
-          headerForegroundColor: Colors.white,
-          todayBackgroundColor: WidgetStatePropertyAll(Colors.white),
-          todayForegroundColor: WidgetStatePropertyAll(Colors.black),
-          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return const Color(0xFFFFCC29);
-            }
-            return null;
-          }),
-          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return Colors.black;
-            }
-            return Colors.white;
-          }),
-          dayOverlayColor: WidgetStatePropertyAll(Colors.transparent),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            textStyle: const TextStyle(fontFamily: 'Objective'),
-          ),
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          labelStyle: TextStyle(color: Colors.white),
-          suffixIconColor: Colors.white,
-        ),
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: Colors.white,
-          selectionColor: Colors.white54,
-          selectionHandleColor: Colors.white,
-        ),
-        checkboxTheme: CheckboxThemeData(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          side: const BorderSide(color: Colors.white, width: 1.5),
-          fillColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return Colors.white;
-            return Colors.transparent;
-          }),
-          checkColor: WidgetStateProperty.all(Colors.black),
-        ),
-        radioTheme: RadioThemeData(
-          fillColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return Colors.white;
-            }
-            return Colors.white;
-          }),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            textStyle: const TextStyle(fontFamily: 'Objective'),
-          ),
-        ),
-      ),
+      // Remove or comment out darkTheme
+      // darkTheme: ThemeData(...),
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
@@ -343,3 +260,4 @@ class _HalogenAppState extends State<HalogenApp> {
     );
   }
 }
+

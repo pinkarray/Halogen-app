@@ -1362,7 +1362,7 @@ void initState() {
         );
         
         // Submit all answers to ensure everything is saved
-        final success = await profileProvider.profileProvider.submitAllAnswers();
+        final success = await profileProvider.submitAllAnswers();
         
         // Close loading indicator
         Navigator.pop(context);

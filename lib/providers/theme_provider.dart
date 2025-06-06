@@ -4,58 +4,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum AppThemeMode { light, dark, system }
 
 class ThemeProvider with ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.system;
+  // Always return light theme mode regardless of saved preferences
+  ThemeMode get themeMode => ThemeMode.light;
   
-  ThemeProvider() {
-    loadSavedTheme();
-  }
-
-  ThemeMode get themeMode => _themeMode;
-
+  // Keep this method but make it do nothing
   Future<void> loadSavedTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final themeString = prefs.getString('theme_mode') ?? 'system';
-    
-    switch (themeString) {
-      case 'light':
-        _themeMode = ThemeMode.light;
-        break;
-      case 'dark':
-        _themeMode = ThemeMode.dark;
-        break;
-      default:
-        _themeMode = ThemeMode.system;
-    }
-    notifyListeners();
+    // Do nothing
   }
 
+  // Keep this method but make it do nothing
   Future<void> setTheme(AppThemeMode mode) async {
-    switch (mode) {
-      case AppThemeMode.light:
-        _themeMode = ThemeMode.light;
-        break;
-      case AppThemeMode.dark:
-        _themeMode = ThemeMode.dark;
-        break;
-      case AppThemeMode.system:
-        _themeMode = ThemeMode.system;
-        break;
-    }
-    
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme_mode', _themeMode.toString().split('.').last);
-    
-    notifyListeners();
+    // Do nothing
   }
 
-  AppThemeMode get currentAppTheme {
-    switch (_themeMode) {
-      case ThemeMode.light:
-        return AppThemeMode.light;
-      case ThemeMode.dark:
-        return AppThemeMode.dark;
-      case ThemeMode.system:
-        return AppThemeMode.system;
-    }
-  }
+  // Always return light theme
+  AppThemeMode get currentAppTheme => AppThemeMode.light;
 }

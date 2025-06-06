@@ -208,47 +208,77 @@ class SecurityProfileProvider with ChangeNotifier {
     }
   }
 
-  // Future<void> submitAnswer({
-  //   required String questionId,
-  //   String? optionId,
-  //   required String value,
-  //   required String label,
-  //   Map<String, dynamic>? info,
-  // }) async {
-  //   final token = await SessionManager.getAuthToken();
-  //   final url = Uri.parse('$baseUrl/answers');
+  // Move this method inside the class and fix its implementation
+  Future<bool> submitAllAnswers() async {
+    final token = await SessionManager.getAuthToken();
+    final url = Uri.parse('$baseUrl/answers');
 
-  //   final body = {
-  //     "answers": [
-  //       {
-  //         "question_id": questionId,
-  //         "option_id": optionId,
-  //         "value": value,
-  //         "label": label,
-  //         "info": info ?? {}
-  //       }
-  //     ]
-  //   };
+    // Convert answers map to the format expected by the API
+    final List<Map<String, dynamic>> answersList = [];
+    
+    _answers.forEach((questionId, value) {
+      // Find the question to get its label
+      QuestionModel? question;
+      for (final section in _sectionQuestions.values) {
+        final found = section.firstWhere(
+          (q) => q.id == questionId.split('-').first, // Handle indexed questions
+          orElse: () => QuestionModel.empty(),
+        );
+        if (found.id.isNotEmpty) {
+          question = found;
+          break;
+        }
+      }
+      
+      if (question != null && value != null && value.toString().isNotEmpty) {
+        // For dropdown questions, find the option ID
+        String? optionId;
+        if (question.type == 'dropdown') {
+          final option = question.options.firstWhere(
+            (o) => o.label == value.toString(),
+            orElse: () => OptionModel(id: '', label: '', score: 0),
+          );
+          if (option.id.isNotEmpty) {
+            optionId = option.id;
+          }
+        }
+        
+        answersList.add({
+          "question_id": questionId.split('-').first, // Get the base question ID
+          "option_id": optionId,
+          "value": value.toString(),
+          "label": question.question,
+          "info": {}
+        });
+      }
+    });
+    
+    if (answersList.isEmpty) return true; // Nothing to submit
+    
+    final body = {"answers": answersList};
+    
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
 
-  //   try {
-  //     final response = await http.post(
-  //       url,
-  //       headers: {
-  //         'Authorization': 'Bearer $token',
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: json.encode(body),
-  //     );
-
-  //     if (response.statusCode == 201 || response.statusCode == 200) {
-  //       print('[submitAnswer] Answer sent successfully');
-  //     } else {
-  //       print('[submitAnswer] Failed: ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     print('[submitAnswer] Error: $e');
-  //   }
-  // }
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('[submitAllAnswers] ${answersList.length} answers sent successfully');
+        return true;
+      } else {
+        print('[submitAllAnswers] Failed: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('[submitAllAnswers] Error: $e');
+      return false;
+    }
+  }
 
   Future<List<Map<String, dynamic>>> fetchSubmittedAnswers() async {
     final token = await SessionManager.getAuthToken();
@@ -370,77 +400,5 @@ class SecurityProfileProvider with ChangeNotifier {
 
   void clearCompletedIndicesAbove(int count, Set<int> indices) {
     indices.removeWhere((i) => i >= count);
-  }
-}
-
-
-Future<bool> submitAllAnswers(dynamic answers) async {
-  final token = await SessionManager.getAuthToken();
-  final url = Uri.parse('$baseUrl/answers');
-
-  // Convert answers map to the format expected by the API
-  final List<Map<String, dynamic>> answersList = [];
-  
-  answers.forEach((questionId, value, dynamic sectionQuestions) {
-    // Find the question to get its label
-    QuestionModel? question;
-    for (final section in sectionQuestions.values) {
-      final found = section.firstWhere(
-        (q) => q.id == questionId,
-        orElse: () => QuestionModel.empty(),
-      );
-      if (found.id.isNotEmpty) {
-        question = found;
-        break;
-      }
-    }
-    
-    if (question != null && value != null && value.toString().isNotEmpty) {
-      // For dropdown questions, find the option ID
-      String? optionId;
-      if (question.type == 'dropdown') {
-        final option = question.options.firstWhere(
-          (o) => o.label == value.toString(),
-          orElse: () => OptionModel(id: '', label: '', score: 0),
-        );
-        if (option.id.isNotEmpty) {
-          optionId = option.id;
-        }
-      }
-      
-      answersList.add({
-        "question_id": questionId,
-        "option_id": optionId,
-        "value": value.toString(),
-        "label": question.question,
-        "info": {}
-      });
-    }
-  });
-  
-  if (answersList.isEmpty) return true; // Nothing to submit
-  
-  final body = {"answers": answersList};
-  
-  try {
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(body),
-    );
-
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      print('[submitAllAnswers] ${answersList.length} answers sent successfully');
-      return true;
-    } else {
-      print('[submitAllAnswers] Failed: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    print('[submitAllAnswers] Error: $e');
-    return false;
   }
 }

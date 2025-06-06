@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/widgets/halogen_back_button.dart';
 import '../../../shared/widgets/service_option_group.dart';
+import '../../../shared/widgets/vehicle_choice_group.dart';
 import '../../../shared/widgets/secured_mobility_progress_bar.dart';
 import './providers/secured_mobility_provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -18,6 +19,31 @@ class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
         provider.markStageComplete(2);
       }
     });
+
+    // Vehicle data with images and details
+    final vehicles = [
+      {
+        'type': 'SUV',
+        'model': 'Mahindra 3x0',
+        'regNumber': 'FKJ-254XA',
+        'color': 'Blue color',
+        'image': 'assets/images/toyota_camry.jpeg',
+      },
+      {
+        'type': 'SUV',
+        'model': 'Mahindra 3x0',
+        'regNumber': 'FKJ-254XA',
+        'color': 'Blue color',
+        'image': 'assets/images/toyota_camry.jpeg',
+      },
+      {
+        'type': 'Sedan',
+        'model': 'Mahindra 3x0',
+        'regNumber': 'FKJ-254XA',
+        'color': 'Blue color',
+        'image': 'assets/images/toyota_camry.jpeg',
+      },
+    ];
 
     return Scaffold(
       body: Container(
@@ -71,11 +97,11 @@ class SecuredMobilityServiceConfigurationScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                
-                const ServiceOptionGroup(
+                // Custom vehicle choice group with cards
+                VehicleChoiceGroup(
                   title: 'Vehicle Choice',
                   sectionKey: 'vehicle_choice',
-                  options: ['SUV', 'Sedan'],
+                  vehicles: vehicles,
                 ),
                 const SizedBox(height: 20),
 
