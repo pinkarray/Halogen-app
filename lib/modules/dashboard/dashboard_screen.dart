@@ -303,6 +303,8 @@ class _UserInfoRow extends StatelessWidget {
                 fontFamily: 'Objective',
                 fontSize: 15,
               ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
             ),
           ),
         ],
