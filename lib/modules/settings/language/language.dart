@@ -31,9 +31,6 @@ class LanguageSettingsScreen extends StatelessWidget {
         children: [
           _buildTile(context, provider, 'English', const Locale('en')),
           _buildTile(context, provider, 'French', const Locale('fr')),
-          _buildTile(context, provider, 'Yoruba', const Locale('yo')),
-          _buildTile(context, provider, 'Igbo', const Locale('ig')),
-          _buildTile(context, provider, 'Hausa', const Locale('ha')),
         ],
       ),
     );

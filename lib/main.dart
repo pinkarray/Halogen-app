@@ -62,7 +62,6 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ServiceProvider()),
-        
       ],
       child: const HalogenApp(),
     ),
@@ -78,7 +77,7 @@ class HalogenApp extends StatefulWidget {
 
 class _HalogenAppState extends State<HalogenApp> {
   late QuickActionsService _quickActionsService;
-  
+
   @override
   void initState() {
     super.initState();
@@ -109,10 +108,9 @@ class _HalogenAppState extends State<HalogenApp> {
           dayPeriodShape:
               RoundedRectangleBorder(), // Optional for rounded button
           dayPeriodColor: WidgetStateColor.resolveWith(
-            (states) =>
-                states.contains(WidgetState.selected)
-                    ? const Color(0xFFFFCC29)
-                    : Colors.white,
+            (states) => states.contains(WidgetState.selected)
+                ? const Color(0xFFFFCC29)
+                : Colors.white,
           ),
           // Default background when not selected
           dialHandColor: Colors.black,
@@ -191,7 +189,37 @@ class _HalogenAppState extends State<HalogenApp> {
           ),
         ),
       ),
-      
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        primaryColor: Colors.black,
+        fontFamily: 'Objective',
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFFFCC29), // yellow accent
+          secondary: Color(0xFF1C2B66), // brand blue
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1C2B66),
+          foregroundColor: Colors.white,
+        ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFFFCC29)),
+          ),
+          labelStyle: TextStyle(color: Colors.white),
+          suffixIconColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFFFCC29),
+            foregroundColor: Colors.black,
+          ),
+        ),
+      ),
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
@@ -200,26 +228,26 @@ class _HalogenAppState extends State<HalogenApp> {
         '/physical-security': (context) => const PhysicalSecurityScreen(),
         '/desired-services': (_) => const DesiredServicesScreen(),
         '/result': (_) => const PhysicalSecurityResultScreen(),
-        '/continue-registration':
-            (context) => const ContinueRegistrationScreen(),
+        '/continue-registration': (context) =>
+            const ContinueRegistrationScreen(),
         '/secured-mobility': (context) => const SecuredMobilityScreen(),
-        '/secured-mobility/desired-services':
-            (context) => const SecuredMobilityDesiredServicesScreen(),
-        '/secured-mobility/service-configuration':
-            (context) => const SecuredMobilityServiceConfigurationScreen(),
-        '/secured-mobility/schedule-service':
-            (context) => const ScheduleServiceScreen(),
+        '/secured-mobility/desired-services': (context) =>
+            const SecuredMobilityDesiredServicesScreen(),
+        '/secured-mobility/service-configuration': (context) =>
+            const SecuredMobilityServiceConfigurationScreen(),
+        '/secured-mobility/schedule-service': (context) =>
+            const ScheduleServiceScreen(),
         '/secured-mobility/summary': (context) => const ConfirmOrderScreen(),
         '/secured-mobility/payment': (context) => const PaymentScreen(),
-        '/secured-mobility/payment-success':
-            (context) => const PaymentSuccessScreen(),
-        '/outsourcing-talent/desired-services':
-            (context) => const OutsourcingDesiredServicesScreen(),
+        '/secured-mobility/payment-success': (context) =>
+            const PaymentSuccessScreen(),
+        '/outsourcing-talent/desired-services': (context) =>
+            const OutsourcingDesiredServicesScreen(),
         '/outsourcing-talent': (context) => const OutsourcingTalentScreen(),
-        '/outsourcing-talent/description':
-            (context) => const DescriptionOfNeedScreen(),
-        '/outsourcing-talent/confirmation':
-            (context) => const ConfirmationScreen(),
+        '/outsourcing-talent/description': (context) =>
+            const DescriptionOfNeedScreen(),
+        '/outsourcing-talent/confirmation': (context) =>
+            const ConfirmationScreen(),
         ...settingsRoutes,
         '/settings': (context) => const SettingsScreen(),
         // Add routes for quick actions
