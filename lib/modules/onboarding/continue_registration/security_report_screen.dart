@@ -30,7 +30,7 @@ class _SecurityReportScreenState extends State<SecurityReportScreen> {
     final userProvider = context.read<UserFormDataProvider>();
 
     // Submit all answers before fetching the report
-    await profileProvider.profileProvider.submitAllAnswers();
+    await profileProvider.submitAllAnswers();  // Fixed: removed .profileProvider
     
     // Add a small delay to ensure server processes the answers
     await Future.delayed(const Duration(seconds: 1));
